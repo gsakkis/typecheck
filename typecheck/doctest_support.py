@@ -6,7 +6,7 @@ globals() dict is the __dict__ of their module. In the case of
 decorated functions, the globals() dict *is* not the right one.
 
 To enable support for doctest do:
-    
+
     import typecheck.doctest_support
 
 This import must occur before any calls to doctest methods.
@@ -18,9 +18,9 @@ def __DocTestFinder_from_module(self, module, object):
     module.
     """
     import inspect
-    
+
     if module is None:
-        return True 
+        return True
     elif inspect.isfunction(object) or inspect.isclass(object):
         return module.__name__ == object.__module__
     elif inspect.getmodule(object) is not None:

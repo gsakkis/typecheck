@@ -52,7 +52,7 @@ def test_add_accepts_to_naked_function_3():
 
 def test_add_accepts_to_naked_function_4():
     """Adding accepts to a naked function: kw params, kw types"""
-    
+
     def foo(kw_1=5, kw_2=6, kw_3=7):
         pass
 
@@ -102,7 +102,7 @@ def test_call_accepts_func_pos_params_kw_types():
 
 def test_call_accepts_func_kw_params_kw_types():
     """Calling an accepts-checked function: kw params, pos args"""
-    
+
     @accepts(kw_1=int, kw_2=int, kw_3=int)
     def foo(kw_1=5, kw_2=6, kw_3=7):
         pass
@@ -130,4 +130,3 @@ if __name__ == '__main__':
 
     for test in sorted(tests, key=lambda o: o.__doc__):
         print test.__doc__.ljust(max_len), ':', test()
-

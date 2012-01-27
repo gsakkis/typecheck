@@ -15,5 +15,5 @@ loader = unittest.TestLoader()
 for t in tests:
     __import__('tests.' + t)
     mod = globals()[t]
-    
+
     all_tests.addTests( loader.loadTestsFromModule(mod) )

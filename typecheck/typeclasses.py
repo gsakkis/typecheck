@@ -10,15 +10,15 @@ try:
     del Decimal
 except ImportError:
     pass
-    
+
 Number = Typeclass(*_numbers)
 del _numbers
-    
+
 ### String -- subinstance of ImSequence
 ####################################################
 
 String = Typeclass(str, unicode)
-    
+
 ### ImSequence -- immutable sequences
 ####################################################
 

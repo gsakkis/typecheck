@@ -4,10 +4,10 @@ from typecheck import register_type, _TC_Exception
 class _TC_IterationError(_TC_NestedError):
     def __init__(self, iteration, value, inner_exception):
         _TC_NestedError.__init__(self, inner_exception)
-    
+
         self.iteration = iteration
         self.value = value
-        
+
     def error_message(self):
         return ("at iteration %d (value: %s)" % (self.iteration, repr(self.value))) + _TC_NestedError.error_message(self)
 
@@ -22,7 +22,7 @@ class _TC_IterationError(_TC_NestedError):
 class _UnorderedIteratorMixin(object):
     def __init__(self, class_name, obj):
         vals = [o for o in obj]
-    
+
         self.type = self
         self._type = Or(*vals)
         self.__cls = obj.__class__
@@ -41,7 +41,7 @@ class _UnorderedIteratorMixin(object):
             except _TC_Exception, e:
                 raise _TC_IterationError(i, item, e)
 
-    @classmethod    
+    @classmethod
     def __typesig__(cls, obj):
         if isinstance(obj, cls):
             return obj
@@ -80,5 +80,5 @@ def UnorderedIteratorMixin(class_name):
     # Alternatively, you could just look in FooClass.__bases__ later; whatever
     register_type(UIM)
     return UIM
-    
+
 register_type(_UnorderedIteratorMixin)

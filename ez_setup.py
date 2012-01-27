@@ -161,4 +161,3 @@ def main(argv, version=DEFAULT_VERSION):
             print '(Run "ez_setup.py -U setuptools" to reinstall or upgrade.)'
 if __name__=='__main__':
     main(sys.argv[1:])
-

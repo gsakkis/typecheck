@@ -5,7 +5,7 @@ import os.path
 import time
 
 from unittest import _strclass
-    
+
 def run_all_tests(test_mod=None, tests=None):
     if tests is None:
         tests = unittest.TestLoader().loadTestsFromModule(test_mod)
@@ -17,15 +17,15 @@ def adjust_path():
 
 class _Todo_Exception(Exception):
     def __init__(self, message):
-        Exception.__init__(self, message)   
+        Exception.__init__(self, message)
         self.message = message
 
 class Todo_Failed(_Todo_Exception):
     pass
-        
+
 class Todo_Passed(_Todo_Exception):
     pass
-    
+
 def TODO(message="TODO"):
     def decorator(func):
         def __todo_func(*args, **kwargs):
@@ -43,21 +43,21 @@ def TODO(message="TODO"):
 class TodoResult(unittest.TestResult):
     def __init__(self):
         unittest.TestResult.__init__(self)
-        
+
         self.todo_failed = []
         self.todo_passed = []
 
     def addTodoFailed(self, test, err):
         self.todo_failed.append((test, self._exc_info_to_string(err, test)))
-        
+
     def addTodoPassed(self, test, err):
-        self.todo_passed.append((test, self._exc_info_to_string(err, test)))    
+        self.todo_passed.append((test, self._exc_info_to_string(err, test)))
 
     def wasSuccessful(self):
         p_success = unittest.TestResult.wasSuccessful(self)
-        
+
         return p_success and not self.stillTodo()
-        
+
     def stillTodo(self):
         return self.todo_failed or self.todo_passed
 
@@ -65,26 +65,26 @@ class TodoTextResult(unittest._TextTestResult, TodoResult):
     def __init__(self, *vargs, **kwargs):
         TodoResult.__init__(self)
         unittest._TextTestResult.__init__(self, *vargs, **kwargs)
-        
+
     def addTodoFailed(self, test, err):
         TodoResult.addTodoFailed(self, test, err)
         if self.showAll:
             self.stream.writeln("TODO FAIL")
         elif self.dots:
             self.stream.write('TF')
-            
+
     def addTodoPassed(self, test, err):
         TodoResult.addTodoPassed(self, test, err)
         if self.showAll:
             self.stream.writeln("TODO PASS")
         elif self.dots:
             self.stream.write('TP')
-            
+
     def printErrors(self):
         self.printErrorList('TODO(PASS)', self.todo_passed)
         self.printErrorList('TODO(FAIL)', self.todo_failed)
 
-        unittest._TextTestResult.printErrors(self)      
+        unittest._TextTestResult.printErrors(self)
 
 class TodoCase(unittest.TestCase):
     def __init__(self, methodName='runTest'):
@@ -93,7 +93,7 @@ class TodoCase(unittest.TestCase):
             not have a method with the specified name.
         """
         unittest.TestCase.__init__(self, methodName)
-        
+
         try:
             self.__testMethodName = methodName
             testMethod = getattr(self, methodName)
@@ -101,7 +101,7 @@ class TodoCase(unittest.TestCase):
         except AttributeError:
             raise ValueError, "no such test method in %s: %s" % \
                 (self.__class__, methodName)
-                  
+
     def shortDescription(self):
         """Returns a one-line description of the test, or None if no
         description has been provided.
@@ -111,14 +111,14 @@ class TodoCase(unittest.TestCase):
         """
         doc = self.__testMethodDoc
         return doc and doc.split("\n")[0].strip() or None
-        
+
     def __str__(self):
         return "%s (%s)" % (self.__testMethodName, _strclass(self.__class__))
 
     def __repr__(self):
         return "<%s testMethod=%s>" % \
             (_strclass(self.__class__), self.__testMethodName)
-            
+
     def __exc_info(self):
         """Return a version of sys.exc_info() with the traceback frame
         minimised; usually the top level of the traceback frame is not
@@ -166,7 +166,7 @@ class TodoCase(unittest.TestCase):
             if ok: result.addSuccess(self)
         finally:
             result.stopTest(self)
-    
+
 class TodoTextRunner(unittest.TextTestRunner):
     def run(self, test):
         "Run the given test case or test suite."
@@ -188,7 +188,7 @@ class TodoTextRunner(unittest.TextTestRunner):
                 self.stream.write("FAILED (")
 
             status = ("failures", "errors", "todo_passed", "todo_failed")
-            self.stream.write(", ".join("%s=%d" % (s, len(getattr(result, s))) for s in status)) 
+            self.stream.write(", ".join("%s=%d" % (s, len(getattr(result, s))) for s in status))
 
             self.stream.writeln(")")
         else:
@@ -206,7 +206,7 @@ def test_equality(eq_tests, ne_tests, repeats=10):
 
     # We run this multiple times to try and shake out any errors
     # related to differences in set/dict/etc ordering
-    for _ in xrange(0, repeats):                
+    for _ in xrange(0, repeats):
         for (left, right) in eq_tests:
             try:
                 assert left == right
@@ -228,13 +228,13 @@ def test_equality(eq_tests, ne_tests, repeats=10):
                 assert not left == right
             except AssertionError:
                 raise AssertionError(eq_error % (left, right))
-                
+
 def test_hash(eq_tests, ne_tests, repeats=10):
     hash_error = "Problem with hash() with %s and %s"
 
     # We run this multiple times to try and shake out any errors
     # related to differences in set/dict/etc ordering
-    for _ in xrange(0, repeats):                
+    for _ in xrange(0, repeats):
         for (left, right) in eq_tests:
             try:
                 assert hash(left) == hash(right)

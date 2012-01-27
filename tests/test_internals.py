@@ -13,33 +13,33 @@ def check_type(typ, obj):
 class SingleTests(TestCase):
     def test_success_builtin_types(self):
         from typecheck import Single
-        
+
         check_type(Single(int), 7)
         check_type(Single(float), 7.0)
 
     def test_success_userdef_classes_oldstyle(self):
         from typecheck import Single
-            
+
         class A: pass
         class B(A): pass
-        
+
         check_type(Single(A), A())
         check_type(Single(A), B())
         check_type(Single(B) ,B())
-        
+
     def test_success_userdef_classes_newstyle(self):
         from typecheck import Single
-            
+
         class A(object): pass
         class B(A): pass
-        
+
         check_type(Single(A), A())
         check_type(Single(A), B())
         check_type(Single(B), B())
-        
+
     def test_failure(self):
         from typecheck import Single, _TC_TypeError
-        
+
         try:
             check_type(Single(int), 7.0)
         except _TC_TypeError, e:
@@ -47,48 +47,48 @@ class SingleTests(TestCase):
             assert e.wrong == float
         else:
             raise AssertionError("Failed to raise the proper exception")
-            
+
     def test_equality(self):
         from typecheck import Single
-        
+
         class A(object): pass
         class B(A): pass
-        
+
         eq_tests = [
             (Single(int), Single(int)),
             (Single(A), Single(A)),
             (Single(B), Single(B)) ]
-            
+
         ne_tests = [
             (Single(int), Single(float)),
             (Single(A), Single(B)) ]
-        
+
         test_equality(eq_tests, ne_tests)
-        
+
     def test_hash(self):
         from typecheck import Single
-        
+
         class A(object): pass
         class B(A): pass
-        
+
         eq_tests = [
             (Single(int), Single(int)),
             (Single(A), Single(A)),
             (Single(B), Single(B)) ]
-            
+
         ne_tests = [
             (Single(int), Single(float)),
             (Single(A), Single(B)) ]
-        
+
         test_hash(eq_tests, ne_tests)
 
 class DictTests(TestCase):
     def setUp(self):
         from typecheck import Dict
-    
+
         def dic(obj):
             check_type(Dict(key=str, val=int), obj)
-    
+
         self.dict = dic
 
     def test_success(self):
@@ -97,7 +97,7 @@ class DictTests(TestCase):
 
     def test_key_failure(self):
         from typecheck import _TC_KeyError, _TC_TypeError
-    
+
         try:
             self.dict({1.0: 1, 'b': 2})
         except _TC_KeyError, e:
@@ -107,10 +107,10 @@ class DictTests(TestCase):
             assert e.inner.right == str
         else:
             self.fail("Passed incorrectly")
-        
+
     def test_val_failure(self):
         from typecheck import _TC_KeyValError, _TC_TypeError
-    
+
         try:
             # 1.0 is not an integer
             self.dict({'a': 1.0, 'b': 2})
@@ -122,10 +122,10 @@ class DictTests(TestCase):
             assert e.inner.right == int
         else:
             self.fail("Passed incorrectly")
-            
+
     def test_type_failure(self):
         from typecheck import _TC_TypeError
-    
+
         try:
             self.dict( 5.0 )
         except _TC_TypeError, e:
@@ -133,49 +133,49 @@ class DictTests(TestCase):
             assert e.right == { str: int }
         else:
             self.fail("Passed incorrectly")
-            
+
     def test_equality(self):
         from typecheck import Dict
-        
+
         class A(object): pass
         class B(A): pass
-        
+
         eq_tests = [
             (Dict(str, int), Dict(str, int)),
             (Dict(str, A), Dict(str, A)),
             (Dict(str, Dict(str, int)), Dict(str, Dict(str, int))) ]
-            
+
         ne_tests = [
             (Dict(str, int), Dict(int, str)),
             (Dict(str, int), {'a': 5}),
             (Dict(str, Dict(str, int)), Dict(str, Dict(int, str))) ]
-        
+
         test_equality(eq_tests, ne_tests)
-        
+
     def test_hash(self):
         from typecheck import Dict
-        
+
         class A(object): pass
         class B(A): pass
-        
+
         eq_tests = [
             (Dict(str, int), Dict(str, int)),
             (Dict(str, A), Dict(str, A)),
             (Dict(str, Dict(str, int)), Dict(str, Dict(str, int))) ]
-            
+
         ne_tests = [
             (Dict(str, int), Dict(int, str)),
             (Dict(str, Dict(str, int)), Dict(str, Dict(int, str))) ]
-        
+
         test_hash(eq_tests, ne_tests)
-            
+
 class TupleTests(TestCase):
     def setUp(self):
         from typecheck import Tuple
-    
+
         def tup(obj):
             check_type(Tuple(int, float, int), obj)
-    
+
         self.tuple = tup
 
     def test_success(self):
@@ -183,7 +183,7 @@ class TupleTests(TestCase):
 
     def test_type_failure(self):
         from typecheck import _TC_TypeError
-    
+
         try:
             self.tuple( [4, 5, 6] )
         except _TC_TypeError, e:
@@ -191,10 +191,10 @@ class TupleTests(TestCase):
             assert e.wrong == [int]
         else:
             self.fail("Passed incorrectly")
-            
+
     def test_index_failure(self):
         from typecheck import _TC_IndexError, _TC_TypeError
-        
+
         try:
             self.tuple( (5, 'a', 4) )
         except _TC_IndexError, e:
@@ -204,10 +204,10 @@ class TupleTests(TestCase):
             assert e.inner.right == float
         else:
             self.fail("Passed incorrectly")
-            
+
     def test_length_error(self):
         from typecheck import _TC_TypeError
-        
+
         try:
             self.tuple( (3, 4) )
         except _TC_TypeError, e:
@@ -215,56 +215,56 @@ class TupleTests(TestCase):
             assert e.right == (int, float, int)
         else:
             self.fail("Passed incorrectly")
-            
+
     def test_equality(self):
         from typecheck import Tuple
-        
+
         class A(object): pass
         class B(A): pass
-        
+
         eq_tests = [
             (Tuple(str, int), Tuple(str, int)),
             (Tuple(str, A), Tuple(str, A)),
             (Tuple(), Tuple()),
             (Tuple(str, Tuple(str, int)), Tuple(str, Tuple(str, int))) ]
-            
+
         ne_tests = [
             (Tuple(str, int), Tuple(int, str)),
             (Tuple(str, int), (str, int)),
             (Tuple(A, A), Tuple(A, B)),
             (Tuple(str, int, float), Tuple()),
             (Tuple(str, Tuple(str, int)), Tuple(str, Tuple(int, str))) ]
-        
+
         test_equality(eq_tests, ne_tests)
-        
+
     def test_hash(self):
         from typecheck import Tuple
-        
+
         class A(object): pass
         class B(A): pass
-        
+
         eq_tests = [
             (Tuple(str, int), Tuple(str, int)),
             (Tuple(str, A), Tuple(str, A)),
             (Tuple(), Tuple()),
             (Tuple(str, Tuple(str, int)), Tuple(str, Tuple(str, int))) ]
-            
+
         ne_tests = [
             (Tuple(str, int), Tuple(int, str)),
             (Tuple(A, A), Tuple(A, B)),
             (Tuple(str, int, float), Tuple()),
             (Tuple(str, Tuple(str, int)), Tuple(str, Tuple(int, str))) ]
-        
+
         test_hash(eq_tests, ne_tests)
-        
+
     def test_empty_tuple_success(self):
         from typecheck import Tuple
-    
+
         check_type(Tuple(), tuple())
-    
+
     def test_empty_tuple_failure(self):
         from typecheck import Tuple, _TC_TypeError
-        
+
         try:
             check_type(Tuple(), (5, 6))
         except _TC_TypeError, e:
@@ -272,14 +272,14 @@ class TupleTests(TestCase):
             assert e.right == ()
         else:
             self.fail("Passed incorrectly")
-    
+
 class SingleType_ListTests(TestCase):
     def setUp(self):
         from typecheck import List
-    
+
         def lis(obj):
             check_type(List(int), obj)
-    
+
         self.list = lis
 
     def test_success(self):
@@ -288,7 +288,7 @@ class SingleType_ListTests(TestCase):
 
     def test_index_failure(self):
         from typecheck import _TC_IndexError, _TC_TypeError
-    
+
         try:
             self.list( [4,5,6,7.0] )
         except _TC_IndexError, e:
@@ -298,10 +298,10 @@ class SingleType_ListTests(TestCase):
             assert e.inner.wrong == float
         else:
             self.fail("Passed incorrectly")
-            
+
     def test_type_failure(self):
         from typecheck import _TC_TypeError
-        
+
         try:
             self.list( { 'f': 4 } )
         except _TC_TypeError, e:
@@ -309,19 +309,19 @@ class SingleType_ListTests(TestCase):
             assert e.wrong == {str: int}
         else:
             self.fail("Passed incorrectly")
-            
+
     def test_equality(self):
         from typecheck import List
-        
+
         class A(object): pass
         class B(A): pass
-        
+
         eq_tests = [
             (List(str), List(str)),
             (List(A), List(A)),
             (List(), List()),
             (List(List(int)), List(List(int))) ]
-            
+
         ne_tests = [
             (List(str), List(int)),
             (List(A), List(B)),
@@ -329,34 +329,34 @@ class SingleType_ListTests(TestCase):
             (List(List(int)), List(List(List(int)))),
             (List(int), List(int, int)),
             (List(int), [int]) ]
-        
+
         test_equality(eq_tests, ne_tests)
-        
+
     def test_hash(self):
         from typecheck import List
-        
+
         class A(object): pass
         class B(A): pass
-        
+
         eq_tests = [
             (List(str), List(str)),
             (List(A), List(A)),
             (List(), List()),
             (List(List(int)), List(List(int))) ]
-            
+
         ne_tests = [
             (List(str), List(int)),
             (List(A), List(B)),
             (List(), List(int)),
             (List(List(int)), List(List(List(int)))),
             (List(int), List(int, int)) ]
-        
+
         test_hash(eq_tests, ne_tests)
-            
+
 class Pattern_ListTests(TestCase):
     def setUp(self):
         from typecheck import List
-    
+
         def lis(obj):
             check_type(List(int, float), obj)
 
@@ -370,7 +370,7 @@ class Pattern_ListTests(TestCase):
 
     def test_index_failure(self):
         from typecheck import _TC_IndexError, _TC_TypeError
-    
+
         try:
             # 5 is not a float
             self.list( [4,5,6,7.0] )
@@ -381,10 +381,10 @@ class Pattern_ListTests(TestCase):
             assert e.inner.right == float
         else:
             self.fail("Passed incorrectly")
-            
+
     def test_type_failure(self):
         from typecheck import _TC_TypeError
-        
+
         try:
             self.list( { 'f': 4 } )
         except _TC_TypeError, e:
@@ -392,28 +392,28 @@ class Pattern_ListTests(TestCase):
             assert e.wrong == {str: int}
         else:
             self.fail("Passed incorrectly")
-            
+
     def test_length_failure(self):
         from typecheck import _TC_LengthError
-    
+
         try:
             self.list( [4,5.0,6,7.0, 6] )
         except _TC_LengthError, e:
             assert e.wrong == 5
         else:
             self.fail("Passed incorrectly")
-            
+
     def test_equality(self):
         from typecheck import List
-        
+
         class A(object): pass
         class B(A): pass
-        
+
         eq_tests = [
             (List(str, str), List(str, str)),
             (List(A, B), List(A, B)),
             (List(List(int, int), int), List(List(int, int), int)) ]
-            
+
         ne_tests = [
             (List(str, int), List(int, str)),
             (List(A, B), List(B, B)),
@@ -422,20 +422,20 @@ class Pattern_ListTests(TestCase):
             (List(List(int, int)), List(List(List(int, int)))),
             (List(int, int), List(int, int, int)),
             (List(int, int), [int, int]) ]
-        
+
         test_equality(eq_tests, ne_tests)
-        
+
     def test_hash(self):
         from typecheck import List
-        
+
         class A(object): pass
         class B(A): pass
-        
+
         eq_tests = [
             (List(str, str), List(str, str)),
             (List(A, B), List(A, B)),
             (List(List(int, int), int), List(List(int, int), int)) ]
-            
+
         ne_tests = [
             (List(str, int), List(int, str)),
             (List(A, B), List(B, B)),
@@ -443,19 +443,19 @@ class Pattern_ListTests(TestCase):
             (List(), List(int, int)),
             (List(List(int, int)), List(List(List(int, int)))),
             (List(int, int), List(int, int, int)) ]
-        
+
         test_hash(eq_tests, ne_tests)
-            
+
 class NestedTests(TestCase):
     def test_patterned_lists_in_lists(self):
         from typecheck import _TC_IndexError, List, _TC_TypeError
-    
+
         def list1(obj):
             check_type(List( [int, str] ), obj)
-        
+
         # This should pass (list of lists)
         list1( [[4,"foo"], [6,"foo",7,"bar"]] )
-        
+
         try:
             # 6 is not list of alternating integers and strings
             list1( [[4,"foo"], 6] )
@@ -469,13 +469,13 @@ class NestedTests(TestCase):
 
     def test_patterned_lists_of_patterned_lists(self):
         from typecheck import _TC_IndexError, List, Or, _TC_TypeError
-        
+
         # [[[i, s]]] (list of lists of lists of alternating ints and strs)
         def list2(obj):
             check_type(List( [[int, str]] ), obj)
-        
+
         list2( [ [[4,"foo"], [5,"bar"]], [[4,"baz",7,"foo"]] ] )
-        
+
         try:
             # The error is in [4,[6]]; the [6] isn't a string
             list2( [[[6,"a"], [7,"r",8,"q"], [4,[6]], [6,"aaa"]]] )
@@ -493,10 +493,10 @@ class NestedTests(TestCase):
 
     def test_nested_monotype_lists(self):
         from typecheck import _TC_IndexError, List, _TC_TypeError
-    
+
         def list1(obj):
             check_type(List( [int] ), obj)
-        
+
         # This should pass (list of lists)
         list1( [[4,5], [6,7,8]] )
         try:
@@ -509,15 +509,15 @@ class NestedTests(TestCase):
             assert e.inner.right == [int]
         else:
             self.fail("Passed incorrectly")
-            
+
     def test_doubly_nested_monotype_lists(self):
         from typecheck import _TC_IndexError, List, Or
         from typecheck import _TC_TypeError
-        
+
         # [[[i]]] (list of lists of lists of integers)
         def list2(obj):
             check_type(List( [[int]] ), obj)
-        
+
         list2( [[[4,5], [5,6]], [[4]]] )
         try:
             # The error is in [4,[6]]; the [6] isn't an integer
@@ -533,14 +533,14 @@ class NestedTests(TestCase):
             assert e.inner.inner.inner.wrong == [int]
         else:
             self.fail("Passed incorrectly")
-            
+
     def test_lists_of_tuples(self):
         from typecheck import _TC_IndexError, List, _TC_TypeError
-        
+
         # lists of 2-tuples of integer x float
         def list3(obj):
             check_type(List( (int, float) ), obj)
-        
+
         list3( [(1, 2.0), (2, 3.0), (3, 4.0)] )
         try:
             # The types are flipped
@@ -554,16 +554,16 @@ class NestedTests(TestCase):
             assert e.inner.inner.wrong == float
         else:
             self.fail("Passed incorrectly")
-            
+
     def test_singly_nested_tuples(self):
         from typecheck import _TC_IndexError, Tuple, _TC_TypeError
-    
+
         def tup1(obj):
             check_type(Tuple( (int, int), int ), obj)
-        
+
         # This should pass
         tup1( ((4,5), 6) )
-        
+
         try:
             # This should raise an exception
             tup1( ([4,5], 6) )
@@ -574,18 +574,18 @@ class NestedTests(TestCase):
             assert e.inner.wrong == [int]
         else:
             self.fail("Passed incorrectly")
-            
+
     def test_doubly_nested_tuples(self):
         from typecheck import _TC_IndexError, Tuple, _TC_TypeError
-        
+
         # (((i, i), i), i)
         # Triply-nested 2-tuples of integers
         tup1 = Tuple( (int, int), int )
         def tup2(obj):
             check_type(Tuple(tup1, int), obj)
-        
+
         tup2( (((4, 5), 6), 7) )
-        
+
         try:
             # [4,5] is not a 2-tuple of int x int
             tup2( (([4,5], 6), 7) )
@@ -598,17 +598,17 @@ class NestedTests(TestCase):
             assert e.inner.inner.wrong == [int]
         else:
             self.fail("Passed incorrectly")
-            
+
     def test_tuples_of_lists(self):
         from typecheck import _TC_IndexError, Tuple, _TC_TypeError
-        
+
         # 2-tuples of list of integers x list of strs
         def tup3(obj):
             check_type(Tuple( [int], [str] ), obj)
-        
+
         # Should pass
         tup3( ([4,5,6], ["a","b","c"]) )
-        
+
         try:
             tup3( (["a","b","c"], [4,5,6]) )
         except _TC_IndexError, e:
@@ -620,17 +620,17 @@ class NestedTests(TestCase):
             assert e.inner.inner.wrong == str
         else:
             self.fail("Passed incorrectly")
-            
+
     def test_nested_dict_as_val(self):
         from typecheck import _TC_KeyError, _TC_KeyValError, Dict, _TC_TypeError
-    
+
         # int -> {int -> float}
         def dict1(obj):
             check_type(Dict( int, {int: float}), obj)
-        
+
         # Should pass
         dict1( {6: {6: 7.0, 8: 9.0}} )
-        
+
         try:
             # Should fail (7.0 is not an integer)
             dict1( {6: {7.0: 8.0}} )
@@ -648,13 +648,13 @@ class NestedTests(TestCase):
     def test_nested_tuple_as_key(self):
         from typecheck import _TC_KeyError, _TC_IndexError, Dict
         from typecheck import _TC_TypeError
-        
+
         # (int, int) -> float
         def dict2(obj):
             check_type(Dict( (int, int), float ), obj)
-        
+
         dict2( {(4,5): 5.0, (9,9): 9.0} )
-        
+
         try:
             # Should fail; 5.0 in (5.0, 5) is not an integer
             dict2( {(5.0, 5): 5.0} )
@@ -667,7 +667,7 @@ class NestedTests(TestCase):
             assert e.inner.inner.wrong == float
         else:
             self.fail("Passed incorrectly")
-            
+
 class ExtensibleSigTests(TestCase):
     def setUp(self):
         from typecheck import register_type, _TC_TypeError, unregister_type
@@ -676,11 +676,11 @@ class ExtensibleSigTests(TestCase):
         class ExactValue(object):
             def __init__(self, value):
                 self.type = value
-        
+
             def __typecheck__(self, func, to_check):
                 if to_check != self.type:
                     raise _TC_TypeError(to_check, self.type)
-                
+
             @classmethod
             def __typesig__(cls, obj):
                 # Note that you can either include this test
@@ -691,13 +691,13 @@ class ExtensibleSigTests(TestCase):
                     return obj
                 if isinstance(obj, int):
                     return cls(obj)
-        
+
         self.ExactValue = ExactValue
         register_type(ExactValue)
-        
+
     def tearDown(self):
         from typecheck import unregister_type, is_registered_type
-    
+
         if is_registered_type(self.ExactValue):
             unregister_type(self.ExactValue)
 
@@ -718,12 +718,12 @@ class ExtensibleSigTests(TestCase):
             assert e.internal.right == 5
         else:
             raise AssertionError("Succeeded incorrectly")
-    
+
     def test_double_register(self):
         from typecheck import register_type
-        
+
         register_type(self.ExactValue)
-        
+
     def test_unregister_def(self):
         from typecheck import register_type, typecheck_args
         from typecheck import unregister_type
@@ -744,19 +744,19 @@ class ExtensibleSigTests(TestCase):
             pass
         else:
             raise AssertionError("Succeeded incorrectly")
-            
+
     def test_unregister_call_again(self):
         from typecheck import typecheck_args, unregister_type, TypeCheckError, _TC_IndexError
         from typecheck import _TC_TypeError
-        
+
         @typecheck_args(5, 6)
         def foo(a, b):
             return a, b
-            
+
         assert foo(5, 6) == (5, 6)
-        
+
         unregister_type(self.ExactValue)
-        
+
         try:
             foo('a', 5)
         except TypeCheckError, e:
@@ -769,160 +769,160 @@ class ExtensibleSigTests(TestCase):
 class Test_Function(TestCase):
     def test_works_with_Type_function(self):
         from typecheck import Type, Function
-        
+
         def foo(*vargs):
             return vargs
-        
+
         assert isinstance(Type(foo), Function)
-    
+
     def test_works_with_Type_call_method_newstyle(self):
         from typecheck import Type, Function
-        
+
         class Foo(object):
             def __call__(self, *vargs):
                 return vargs
-        
+
         assert isinstance(Type(Foo()), Function)
-    
+
     def test_works_with_Type_call_method_classic(self):
         from typecheck import Type, Function
-        
+
         class Foo:
             def __call__(self, *vargs):
                 return vargs
-        
+
         assert isinstance(Type(Foo()), Function)
-        
+
     def test_works_with_Type_classmethod_newstyle(self):
         from typecheck import Type, Function
-        
+
         class Foo(object):
             @classmethod
             def foo(*vargs):
                 return vargs
-        
+
         assert isinstance(Type(Foo.foo), Function)
-        
+
     def test_works_with_Type_classmethod_classic(self):
         from typecheck import Type, Function
-        
+
         class Foo:
             @classmethod
             def foo(*vargs):
                 return vargs
-        
+
         assert isinstance(Type(Foo.foo), Function)
-        
+
     def test_works_with_Type_instancemethod_newstyle(self):
         from typecheck import Type, Function
-        
+
         class Foo(object):
             def foo(*vargs):
                 return vargs
-        
+
         assert isinstance(Type(Foo().foo), Function)
-        
+
     def test_works_with_Type_instancemethod_classic(self):
         from typecheck import Type, Function
-        
+
         class Foo:
             def foo(*vargs):
                 return vargs
-        
+
         assert isinstance(Type(Foo().foo), Function)
-        
+
     def test_works_with_Type_staticmethod_newstyle(self):
         from typecheck import Type, Function
-        
+
         class Foo(object):
             @staticmethod
             def foo(*vargs):
                 return vargs
-        
+
         assert isinstance(Type(Foo.foo), Function)
-        
+
     def test_works_with_Type_staticmethod_classic(self):
         from typecheck import Type, Function
-        
+
         class Foo:
             @staticmethod
             def foo(*vargs):
                 return vargs
-        
+
         assert isinstance(Type(Foo.foo), Function)
-        
+
     def test_str(self):
         from typecheck import Function
-        
+
         def foo(*vargs):
             return vargs
-        
+
         assert str(Function(foo)) == "Function(%s)" % foo
-        
+
     def test_repr(self):
         from typecheck import Function
-        
+
         def foo(*vargs):
             return vargs
-        
+
         assert repr(Function(foo)) == "Function(%s)" % foo
-        
+
     def test_check_type_errors_pass_through(self):
         from typecheck import Function, check_type
-        
+
         class MyCustomException(Exception):
             pass
-            
+
         def checker_function(*vargs):
             raise MyCustomException(*vargs)
-            
+
         try:
             check_type(Function(checker_function), None, 66)
         except MyCustomException, e:
             assert e.args == (66,)
         else:
             raise AssertionError("Failed to raise MyCustomException")
-            
+
     def test_check_type_None_means_success(self):
         from typecheck import Function, check_type
-        
+
         def checker_function(*vargs):
             return None
-            
+
         check_type(Function(checker_function), None, 66)
-        
+
     def test_check_type_true_values_mean_success(self):
         from typecheck import Function, check_type
-        
+
         def checker_function(*vargs):
             return True
         check_type(Function(checker_function), None, 66)
-        
+
 
         def checker_function(*vargs):
             return 5
         check_type(Function(checker_function), None, 66)
-        
-        
+
+
         def checker_function(*vargs):
             return "abc"
         check_type(Function(checker_function), None, 66)
-        
+
     def test_check_type_false_values_mean_success(self):
         from typecheck import Function, check_type
-        
+
         def checker_function(*vargs):
             return []
         check_type(Function(checker_function), None, 66)
-        
-        
+
+
         def checker_function(*vargs):
             return {}
         check_type(Function(checker_function), None, 66)
-        
+
     def test_check_type_False_means_failure(self):
         from typecheck import Function, check_type, _TC_FunctionError
-        
+
         def checker_function(*vargs):
             return False
         try:
@@ -932,8 +932,8 @@ class Test_Function(TestCase):
             assert e.rejected_obj == 66
         else:
             raise AssertionError("Failed to raise _TC_FunctionError")
-        
-        
+
+
         # (0 == False) == True
         def checker_function(*vargs):
             return 0
@@ -954,11 +954,11 @@ def convert_mapping(mapping):
 def active_mapping():
     from typecheck import TypeVariables as TV
     return convert_mapping(TV._TypeVariables__active_mapping)
-        
+
 class Test_TypeVariables(TestCase):
     def tearDown(self):
         from typecheck import TypeVariables
-        
+
         # Give ourselves a clean slate
         TypeVariables._TypeVariables__gen_mappings = {}
         TypeVariables._TypeVariables__mapping_stack = []
@@ -966,14 +966,14 @@ class Test_TypeVariables(TestCase):
 
     def test_equality(self):
         from typecheck import TypeVariables
-        
+
         assert TypeVariables('a') != TypeVariables('b')
         assert TypeVariables('a') == TypeVariables('a')
         assert TypeVariables('a') != TypeVariables(u'a')
-        
+
     def test_hash(self):
         from typecheck import TypeVariables
-        
+
         assert hash(TypeVariables('a')) != hash(TypeVariables('b'))
         assert hash(TypeVariables('a')) == hash(TypeVariables('a'))
         assert hash(TypeVariables('a')) != hash(TypeVariables(u'a'))
@@ -1438,34 +1438,34 @@ class Test_TypeVariables(TestCase):
 
     def test_unicode_and_ascii_tvars_1(self):
         from typecheck import accepts, returns
-        
+
         @accepts(u'a', 'a')
         @returns('a', u'a')
         def flip(a, b):
             return b, a
-            
+
         flip(5, 7.0)
-    
+
     def test_unicode_and_ascii_tvars_2(self):
         from typecheck import accepts, returns, TypeCheckError
         from typecheck import _TC_IndexError, _TC_TypeError, TypeVariables
-    
+
         # The signature is wrong (for the function, not the test)
         @accepts(u'a', 'a')
         @returns('a', u'a')
         def foo(a, b):
             return a, b
-            
+
         try:
             foo(4, 5.0)
         except TypeCheckError, e:
             assert isinstance(e.internal, _TC_IndexError)
             assert e.internal.index == 0
-            
+
             assert isinstance(e.internal.inner, _TC_TypeError)
             assert e.internal.inner.right is float
             assert e.internal.inner.wrong is int
-            
+
             assert TypeVariables._TypeVariables__mapping_stack == []
             assert TypeVariables._TypeVariables__active_mapping is None
             assert len(TypeVariables._TypeVariables__gen_mappings) == 0
@@ -1489,7 +1489,7 @@ class Test_TypeVariables(TestCase):
             return a
 
         assert bar(4) == float(4)
-            
+
 ### Bookkeeping ###
 if __name__ == '__main__':
     import __main__
