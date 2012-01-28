@@ -1,12 +1,8 @@
-import support
-from support import TODO, TestCase
+from support import TestCase, adjust_path, run_all_tests
 
 if __name__ == '__main__':
-    support.adjust_path()
+    adjust_path()
 ### /Bookkeeping ###
-
-import typecheck
-import typecheck.mixins
 
 class UnorderedIteratorMixinTests(TestCase):
     def setUp(self):
@@ -48,16 +44,14 @@ class UnorderedIteratorMixinTests(TestCase):
         assert isinstance(uim, _UnorderedIteratorMixin)
 
     def test_success(self):
-        from typecheck import typecheck
-
         MyIter = self.Iter
         foo = self.foo
 
         foo(MyIter(5, 6, 6.0, 7, 8.0, 9.0))
 
     def test_failure(self):
-        from typecheck import typecheck, TypeCheckError, Or
-        from typecheck import _TC_TypeError, _TC_IndexError
+        from typecheck import TypeCheckError, Or
+        from typecheck import _TC_TypeError
         from typecheck.mixins import _TC_IterationError
 
         MyIter = self.Iter
@@ -78,4 +72,4 @@ class UnorderedIteratorMixinTests(TestCase):
 ### Bookkeeping ###
 if __name__ == '__main__':
     import __main__
-    support.run_all_tests(__main__)
+    run_all_tests(__main__)

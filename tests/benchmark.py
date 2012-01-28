@@ -5,9 +5,9 @@ A benchmark script to profile changes to typecheck's deep internals
 import time
 
 ### Bookkeeping ###
-import support
+from support import adjust_path
 if __name__ == '__main__':
-    support.adjust_path()
+    adjust_path()
 ### /Bookkeeping ###
 
 import typecheck
@@ -22,7 +22,7 @@ def test_add_accepts_to_naked_function_1():
         pass
 
     t = time.time()
-    for i in range(0, 10000):
+    for _ in xrange(0, 10000):
         accepts(int)(foo)
     return time.time() - t
 
@@ -33,7 +33,7 @@ def test_add_accepts_to_naked_function_2():
         pass
 
     t = time.time()
-    for i in range(0, 10000):
+    for _ in xrange(0, 10000):
         accepts(int, int, int)(foo)
     return time.time() - t
 
@@ -45,7 +45,7 @@ def test_add_accepts_to_naked_function_3():
         pass
 
     t = time.time()
-    for i in range(0, 10000):
+    for _ in xrange(0, 10000):
         accepts(int_2=int, int_1=int, int_3=int)(foo)
     return time.time() - t
 
@@ -57,7 +57,7 @@ def test_add_accepts_to_naked_function_4():
         pass
 
     t = time.time()
-    for i in range(0, 10000):
+    for _ in xrange(0, 10000):
         accepts(kw_1=int, kw_2=int, kw_3=int)(foo)
     return time.time() - t
 
@@ -70,7 +70,7 @@ def test_call_accepts_func_single_pos_passes():
         pass
 
     t = time.time()
-    for i in range(0, 10000):
+    for _ in xrange(0, 10000):
         foo(5)
     return time.time() - t
 
@@ -82,8 +82,8 @@ def test_call_accepts_func_multi_pos_passes():
         pass
 
     t = time.time()
-    for i in range(0, 10000):
-       foo(5, 6, 7)
+    for _ in xrange(0, 10000):
+        foo(5, 6, 7)
     return time.time() - t
 
 
@@ -95,7 +95,7 @@ def test_call_accepts_func_pos_params_kw_types():
         pass
 
     t = time.time()
-    for i in range(0, 10000):
+    for _ in xrange(0, 10000):
         foo(5, 6, 7)
     return time.time() - t
 
@@ -108,19 +108,9 @@ def test_call_accepts_func_kw_params_kw_types():
         pass
 
     t = time.time()
-    for i in range(0, 10000):
+    for _ in xrange(0, 10000):
         foo(5, 6, 7)
     return time.time() - t
-
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == '__main__':

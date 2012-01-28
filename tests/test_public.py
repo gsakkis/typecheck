@@ -1,9 +1,8 @@
 import sys
-import support
-from support import TODO, TestCase
+from support import TODO, TestCase, adjust_path, run_all_tests
 
 if __name__ == '__main__':
-    support.adjust_path()
+    adjust_path()
 ### /Bookkeeping ###
 
 import types
@@ -26,7 +25,7 @@ class Test_typecheck_return(TestCase):
 
         @typecheck_return([int])
         def foo():
-            return [4,5,6]
+            return [4, 5, 6]
 
         assert foo() == [4, 5, 6]
         assert foo.type_return == [int]
@@ -36,7 +35,7 @@ class Test_typecheck_return(TestCase):
 
         @typecheck_return([int], int, str)
         def foo():
-            return [4,5,6], 5, "foo"
+            return [4, 5, 6], 5, "foo"
 
         assert foo() == ([4, 5, 6], 5, "foo")
         assert foo.type_return == ([int], int, str)
@@ -54,7 +53,7 @@ class Test_typecheck_return(TestCase):
     def test_success_5(self):
         from typecheck import typecheck_return
 
-        @typecheck_return( (int,) )
+        @typecheck_return((int,))
         def foo():
             return (7,)
 
@@ -86,7 +85,7 @@ class Test_typecheck_return(TestCase):
 
         @typecheck_return([int])
         def foo():
-            return [4,5,6.0]
+            return [4, 5, 6.0]
 
         assert foo.type_return == [int]
 
@@ -108,7 +107,7 @@ class Test_typecheck_return(TestCase):
 
         @typecheck_return([int], int, str)
         def foo():
-            return [4,5,6], 5, ["foo"]
+            return [4, 5, 6], 5, ["foo"]
 
         assert foo.type_return == ([int], int, str)
 
@@ -127,7 +126,7 @@ class Test_typecheck_return(TestCase):
     def test_failure_4(self):
         from typecheck import typecheck_return, TypeCheckError, _TC_TypeError
 
-        @typecheck_return( (int,) )
+        @typecheck_return((int,))
         def foo():
             return 7
 
@@ -146,7 +145,7 @@ class Test_typecheck_return(TestCase):
     def test_decorator_returns_function(self):
         from typecheck import typecheck_return
 
-        @typecheck_return( (int,) )
+        @typecheck_return((int,))
         def foo():
             return 7
 
@@ -159,8 +158,8 @@ class Test_typecheck_yield(TestCase):
         @typecheck_yield(int)
         def foo(a):
             yield a
-            yield a+1
-            yield a+2
+            yield a + 1
+            yield a + 2
 
         gen = foo(5)
 
@@ -215,8 +214,8 @@ class Test_typecheck_yield(TestCase):
         @typecheck_yield(int)
         def foo(a):
             yield a
-            yield a+1
-            yield a+2
+            yield a + 1
+            yield a + 2
 
         assert foo.type_yield == int
         assert foo(5).type_yield == foo.type_yield
@@ -242,7 +241,7 @@ class Test_typecheck_yield(TestCase):
 
         @typecheck_yield(int)
         def foo(a):
-            return a+1
+            return a + 1
 
         try:
             assert foo(5) == 6
@@ -405,7 +404,7 @@ class Test_typecheck_args(TestCase):
 
     def test_failure_single_positional(self):
         from typecheck import typecheck_args, TypeCheckError
-        from typecheck import _TC_TypeError, _TC_IndexError
+        from typecheck import _TC_TypeError
 
         @typecheck_args(int)
         def foo(int_1):
@@ -425,7 +424,7 @@ class Test_typecheck_args(TestCase):
 
     def test_failure_multiple_positional_1(self):
         from typecheck import typecheck_args, TypeCheckError
-        from typecheck import _TC_TypeError, _TC_IndexError
+        from typecheck import _TC_TypeError
 
         @typecheck_args(int, int, int)
         def foo(int_1, int_2, int_3):
@@ -444,7 +443,7 @@ class Test_typecheck_args(TestCase):
             raise AssertionError("Succeeded incorrectly")
 
     def test_failure_multiple_positional_2(self):
-        from typecheck import typecheck_args, TypeCheckError
+        from typecheck import typecheck_args
 
         @typecheck_args(int, int)
         def foo(a, b):
@@ -459,7 +458,7 @@ class Test_typecheck_args(TestCase):
 
     def test_failure_multiple_positional_type_by_kw(self):
         from typecheck import typecheck_args, TypeCheckError
-        from typecheck import _TC_TypeError, _TC_IndexError
+        from typecheck import _TC_TypeError
 
         @typecheck_args(int_2=int, int_1=int, int_3=int)
         def foo(int_1, int_2, int_3):
@@ -479,7 +478,7 @@ class Test_typecheck_args(TestCase):
 
     def test_failure_multiple_keyword_1(self):
         from typecheck import typecheck_args, TypeCheckError
-        from typecheck import _TC_TypeError, _TC_KeyValError
+        from typecheck import _TC_TypeError
 
         @typecheck_args(kw_1=int, kw_2=int, kw_3=int)
         def foo(kw_1=5, kw_2=6, kw_3=7):
@@ -499,7 +498,7 @@ class Test_typecheck_args(TestCase):
 
     def test_failure_multiple_keyword_2(self):
         from typecheck import typecheck_args, TypeCheckError
-        from typecheck import _TC_TypeError, _TC_KeyValError
+        from typecheck import _TC_TypeError
 
         @typecheck_args(kw_1=int, kw_2=int, kw_3=int)
         def foo(kw_1=5, kw_2=6, kw_3=7):
@@ -519,7 +518,7 @@ class Test_typecheck_args(TestCase):
 
     def test_failure_multiple_keyword_3(self):
         from typecheck import typecheck_args, TypeCheckError
-        from typecheck import _TC_TypeError, _TC_KeyValError
+        from typecheck import _TC_TypeError
 
         @typecheck_args(kw_1=int, kw_2=int, kw_3=int)
         def foo(kw_1=5, kw_2=6, kw_3=7):
@@ -539,7 +538,7 @@ class Test_typecheck_args(TestCase):
 
     def test_failure_multiple_keyword_type_by_pos_1(self):
         from typecheck import typecheck_args, TypeCheckError
-        from typecheck import _TC_TypeError, _TC_KeyValError
+        from typecheck import _TC_TypeError
 
         @typecheck_args(int, int, int)
         def foo(kw_1=5, kw_2=6, kw_3=7):
@@ -559,7 +558,7 @@ class Test_typecheck_args(TestCase):
 
     def test_failure_multiple_keyword_type_by_pos_2(self):
         from typecheck import typecheck_args, TypeCheckError
-        from typecheck import _TC_TypeError, _TC_KeyValError
+        from typecheck import _TC_TypeError
 
         @typecheck_args(int, int, int)
         def foo(kw_1=5, kw_2=6, kw_3=7):
@@ -579,7 +578,7 @@ class Test_typecheck_args(TestCase):
 
     def test_failure_multiple_keyword_type_by_pos_3(self):
         from typecheck import typecheck_args, TypeCheckError
-        from typecheck import _TC_TypeError, _TC_KeyValError
+        from typecheck import _TC_TypeError
 
         @typecheck_args(int, int, kw_3=int)
         def foo(kw_1=5, kw_2=6, kw_3=7):
@@ -698,7 +697,7 @@ class Test_typecheck_args(TestCase):
 
     def test_failure_pos_and_kw_1(self):
         from typecheck import typecheck_args, TypeCheckError
-        from typecheck import _TC_TypeError, _TC_IndexError
+        from typecheck import _TC_TypeError
 
         @typecheck_args(int, int, foo=int)
         def foo(req_1, req_2, foo=7):
@@ -718,7 +717,7 @@ class Test_typecheck_args(TestCase):
 
     def test_failure_pos_and_kw_2(self):
         from typecheck import typecheck_args, TypeCheckError
-        from typecheck import _TC_TypeError, _TC_KeyValError
+        from typecheck import _TC_TypeError
 
         @typecheck_args(int, int, foo=int)
         def foo(req_1, req_2, foo=7):
@@ -738,7 +737,7 @@ class Test_typecheck_args(TestCase):
 
     def test_failure_pos_and_kw_3(self):
         from typecheck import typecheck_args, TypeCheckError
-        from typecheck import _TC_TypeError, _TC_IndexError
+        from typecheck import _TC_TypeError
 
         @typecheck_args(int, int, foo=int)
         def foo(req_1, req_2, foo=7):
@@ -801,7 +800,7 @@ class Test_typecheck_args(TestCase):
 
     def test_failure_unpacked_tuples_3(self):
         from typecheck import typecheck_args, TypeCheckError
-        from typecheck import _TC_TypeError, _TC_IndexError
+        from typecheck import _TC_TypeError
 
         @typecheck_args(int, (int, (int, int)), int)
         def foo(a, (b, (c, d)), e):
@@ -825,8 +824,8 @@ class Test_typecheck_args(TestCase):
         @typecheck_args(int)
         def foo(a):
             yield a
-            yield a+1
-            yield a+2
+            yield a + 1
+            yield a + 2
 
         gen = foo(5)
 
@@ -838,13 +837,13 @@ class Test_typecheck_args(TestCase):
 
     def test_generators_fail(self):
         from typecheck import typecheck_args, TypeCheckError
-        from typecheck import _TC_IndexError, _TC_TypeError
+        from typecheck import _TC_TypeError
 
         @typecheck_args(int)
         def foo(a):
             yield a
-            yield a+1
-            yield a+2
+            yield a + 1
+            yield a + 2
 
         assert foo.type_args == {'a': int}
 
@@ -1076,8 +1075,8 @@ class Test_cooperation(TestCase):
             @dec_2(int, int)
             def foo(a, b):
                 yield a, b
-                yield a+1, b
-                yield a, b+1
+                yield a + 1, b
+                yield a, b + 1
 
             assert foo.type_yield == (int, int)
             assert foo.type_args == {'a': int, 'b': int}
@@ -1247,7 +1246,7 @@ class Test_cooperation(TestCase):
 
     def test_verify_args_checked_first__return(self):
         from typecheck import typecheck_args, typecheck_return
-        from typecheck import TypeCheckError, _TC_IndexError, _TC_TypeError
+        from typecheck import TypeCheckError, _TC_TypeError
 
         def run_test(dec_1, dec_2):
             @dec_1
@@ -1270,7 +1269,7 @@ class Test_cooperation(TestCase):
 
     def test_verify_args_checked_first__yield(self):
         from typecheck import typecheck_args, typecheck_yield
-        from typecheck import TypeCheckError, _TC_IndexError, _TC_TypeError
+        from typecheck import TypeCheckError, _TC_TypeError
 
         def run_test(dec_1, dec_2):
             @dec_1
@@ -1307,7 +1306,7 @@ class Test_Self_class(TestCase):
 
     def test_self_in_args_fail_1(self):
         from typecheck import typecheck_args, Self, TypeCheckError
-        from typecheck import _TC_IndexError, _TC_TypeError
+        from typecheck import _TC_TypeError
 
         class Test(object):
             @typecheck_args(Self(), int, Self())
@@ -1413,9 +1412,7 @@ class Test_Self_class(TestCase):
         assert Test.foo.type_return == (Self(), int, Self())
 
     def test_self_in_yield_pass(self):
-        from typecheck import typecheck_yield, Self, TypeCheckError
-        from typecheck import _TC_IndexError, _TC_TypeError
-        from typecheck import _TC_GeneratorError
+        from typecheck import typecheck_yield, Self
 
         class Test(object):
             @typecheck_yield(Self(), int, Self())
@@ -1430,7 +1427,6 @@ class Test_Self_class(TestCase):
     def test_self_in_yield_fail(self):
         from typecheck import typecheck_yield, Self, TypeCheckError
         from typecheck import _TC_IndexError, _TC_TypeError
-        from typecheck import _TC_GeneratorError
 
         class Test(object):
             @typecheck_yield(Self(), int, Self())
@@ -1453,9 +1449,8 @@ class Test_Self_class(TestCase):
         assert Test.foo.type_yield == (Self(), int, Self())
 
     def test_self_in_args_yield_pass(self):
-        from typecheck import typecheck_yield, Self, TypeCheckError
-        from typecheck import _TC_IndexError, _TC_TypeError
-        from typecheck import _TC_GeneratorError, typecheck_args
+        from typecheck import typecheck_yield, Self
+        from typecheck import typecheck_args
 
         class Test(object):
             @typecheck_args(Self(), int, int)
@@ -1498,13 +1493,10 @@ class Test_Self_class(TestCase):
 
 class Test_enable_checking_global(TestCase):
     def tearDown(self):
-        import typecheck
-
         typecheck.enable_checking = True
 
     def test_typecheck_args(self):
         from typecheck import typecheck_args, TypeCheckError
-        import typecheck
 
         @typecheck_args(int)
         def foo(a):
@@ -1526,7 +1518,6 @@ class Test_enable_checking_global(TestCase):
 
     def test_typecheck_return(self):
         from typecheck import typecheck_return, TypeCheckError
-        import typecheck
 
         @typecheck_return(int)
         def foo(a):
@@ -1548,7 +1539,6 @@ class Test_enable_checking_global(TestCase):
 
     def test_typecheck_yield(self):
         from typecheck import typecheck_yield, TypeCheckError
-        import typecheck
 
         @typecheck_yield(int)
         def foo(a):
@@ -1591,19 +1581,14 @@ class Test_enable_checking_global(TestCase):
 
 class Test_aliases(TestCase):
     def test_alias(self):
-        from typecheck import typecheck_args, typecheck, accepts
-        from typecheck import typecheck_return, returns
-        from typecheck import typecheck_yield, yields
-
-        assert typecheck is typecheck_args
-        assert accepts is typecheck_args
-        assert returns is typecheck_return
-        assert yields is typecheck_yield
+        assert typecheck.typecheck is typecheck.typecheck_args
+        assert typecheck.accepts is typecheck.typecheck_args
+        assert typecheck.returns is typecheck.typecheck_return
+        assert typecheck.yields is typecheck.typecheck_yield
 
 class Test_signature_checking_hooks(TestCase):
     def setUp(self):
         from typecheck import register_type
-        import types
 
         flags = {'start': [], 'stop': []}
 
@@ -1680,12 +1665,12 @@ class Test_signature_checking_hooks(TestCase):
         assert self.flags['stop'] == ['foo']
 
         assert gen.next() == 5
-        assert self.flags['start'] == ['foo' ,'gen_foo']
+        assert self.flags['start'] == ['foo' , 'gen_foo']
         assert self.flags['stop'] == ['foo']
         try:
             gen.next()
         except StopIteration:
-            assert self.flags['start'] == ['foo' ,'gen_foo']
+            assert self.flags['start'] == ['foo' , 'gen_foo']
             assert self.flags['stop'] == ['foo', 'gen_foo']
         else:
             raise AssertionError("Failed to raise StopIteration at the right point")
@@ -1849,9 +1834,10 @@ class Test_signature_checking_hooks(TestCase):
 
             assert foo(5) == 5
 
-        for funcs in ((typecheck_return, typecheck_args), (typecheck_args, typecheck_return)):
+        for dec_1, dec_2 in ((typecheck_return, typecheck_args),
+                             (typecheck_args, typecheck_return)):
             try:
-                test_double(*funcs)
+                test_double(dec_1, dec_2)
             except RuntimeError:
                 assert self.flags['start'] == ['foo', 'bar']
                 assert self.flags['stop'] == ['bar', 'foo']
@@ -1875,17 +1861,15 @@ class Test_signature_checking_hooks(TestCase):
 
 # We inherit everything else from Test_signature_checking_hooks
 class Test_hooks_ignore_enable_checking(Test_signature_checking_hooks):
-        def setUp(self):
-            Test_signature_checking_hooks.setUp(self)
+    def setUp(self):
+        Test_signature_checking_hooks.setUp(self)
+        typecheck.enable_checking = False
 
-            typecheck.enable_checking = False
-
-        def tearDown(self):
-            Test_signature_checking_hooks.tearDown(self)
-
-            typecheck.enable_checking = True
+    def tearDown(self):
+        Test_signature_checking_hooks.tearDown(self)
+        typecheck.enable_checking = True
 
 ### Bookkeeping ###
 if __name__ == '__main__':
     import __main__
-    support.run_all_tests(__main__)
+    run_all_tests(__main__)

@@ -1,17 +1,17 @@
-import support
-from support import TODO, TestCase
+from support import TestCase, adjust_path, run_all_tests
 
 if __name__ == '__main__':
-    support.adjust_path()
+    adjust_path()
 ### /Bookkeeping ###
 
 import typecheck
-import typecheck.typeclasses
 
 def check_type(typ, obj):
     typecheck.check_type(typ, None, obj)
 
 class TestTypeClass(TestCase):
+    types = ()
+
     def _test_types(self, typeclass):
         for typ in self.types:
             check_type(typeclass, typ)
@@ -25,12 +25,10 @@ class Test_Number(TestTypeClass):
         self._test_types(Number)
 
     def test_decimal(self):
-        try:
-            from decimal import Decimal
+        from decimal import Decimal
+        from typecheck.typeclasses import Number
+        check_type(Number, Decimal(5))
 
-            check_type(Number, Decimal(5))
-        except:
-            pass
 
 class Test_MSequence(TestTypeClass):
     types = (list,)
@@ -98,4 +96,4 @@ class Test_Typeclass(TestCase):
 ### Bookkeeping ###
 if __name__ == '__main__':
     import __main__
-    support.run_all_tests(__main__)
+    run_all_tests(__main__)

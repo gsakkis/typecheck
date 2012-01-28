@@ -1,4 +1,3 @@
-import types
 import unittest
 import sys
 import os.path
@@ -31,8 +30,8 @@ def TODO(message="TODO"):
     def decorator(func):
         def __todo_func(*args, **kwargs):
             try:
-                ret_val = func(*args, **kwargs)
-            except Exception, e:
+                func(*args, **kwargs)
+            except Exception:
                 raise Todo_Failed(message)
             raise Todo_Passed(message)
         __todo_func.__name__ = func.__name__
@@ -130,7 +129,9 @@ class TodoCase(unittest.TestCase):
             return (exctype, excvalue, tb)
         return (exctype, excvalue, tb)
 
-    def run(self, result):
+    def run(self, result=None):
+        if result is None:
+            result = self.defaultTestResult()
         result.startTest(self)
         testMethod = getattr(self, self.__testMethodName)
         try:

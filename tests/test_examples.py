@@ -1,17 +1,18 @@
-import support
-from support import TODO, TestCase
+from support import TestCase, adjust_path, run_all_tests
 
 if __name__ == '__main__':
-    support.adjust_path()
+    adjust_path()
 ### /Bookkeeping ###
 
 import typecheck
-from typecheck import check_type
+
+def check_type(typ, to_check):
+    typecheck.check_type(typ, None, to_check)
 
 class TypeCheckedTree(TestCase):
     def setUp(self):
         from typecheck import typecheck_args, register_type
-        from typecheck import check_type, _TC_Exception, Type
+        from typecheck import _TC_Exception, Type
         from typecheck import _TC_NestedError, _TC_TypeError
 
         class _TC_TreeChildTypeError(_TC_NestedError):
@@ -33,15 +34,15 @@ class TypeCheckedTree(TestCase):
                     raise _TC_TypeError(to_check, self._type)
 
                 try:
-                    check_type(self._type, func, to_check.val)
-                except _TC_Exception, e:
+                    typecheck.check_type(self._type, func, to_check.val)
+                except _TC_Exception:
                     raise _TC_TypeError(to_check.val, self._type.type)
 
                 for side in ('right', 'left'):
                     child = getattr(to_check, side)
                     if child is not None:
                         try:
-                            check_type(self, func, child)
+                            typecheck.check_type(self, func, child)
                         except _TC_Exception, e:
                             raise _TC_TreeChildTypeError(side, e)
 
@@ -98,7 +99,7 @@ class TypeCheckedTree(TestCase):
         preorder(Tree(5, Tree(6), Tree(7)))
 
     def test_failure(self):
-        from typecheck import TypeCheckError, _TC_IndexError, _TC_TypeError
+        from typecheck import TypeCheckError, _TC_TypeError
 
         Tree = self.Tree
         preorder = self.preorder
@@ -118,37 +119,27 @@ class TypeCheckedTree(TestCase):
 
 # An example of Xor being implemented in terms of the included And, Not
 # and Or utility classes
-class Xor(TestCase):
+class XorCase(TestCase):
     def setUp(self):
         from typecheck import Or, And, Not
 
         def Xor(cond_1, cond_2):
             return Or(And(cond_1, Not(cond_2)), And(cond_2, Not(cond_1)))
 
-        def check_type(typ, to_check):
-            typecheck.check_type(typ, None, to_check)
-
         self.Xor = Xor
-        self.check_type = check_type
 
     def test_success(self):
         from typecheck import IsCallable
 
-        Xor = self.Xor
-        check_type = self.check_type
-
-        check_type(Xor(dict, IsCallable()), pow)
-        check_type(Xor(dict, IsCallable()), {'a': 5})
+        check_type(self.Xor(dict, IsCallable()), pow)
+        check_type(self.Xor(dict, IsCallable()), {'a': 5})
 
     def test_failure(self):
         from typecheck import IsIterable, _TC_TypeError
 
-        Xor = self.Xor
-        check_type = self.check_type
-
         for obj in (pow, {'a': 5}):
             try:
-                check_type(Xor(dict, IsIterable()), pow)
+                check_type(self.Xor(dict, IsIterable()), obj)
             except _TC_TypeError:
                 pass
             else:
@@ -156,37 +147,27 @@ class Xor(TestCase):
 
 # An example of IsIterable being implemented in terms of HasAttr() and
 # IsCallable()
-class IsIterable(TestCase):
+class IsIterableCase(TestCase):
     def setUp(self):
         from typecheck import HasAttr, IsCallable
 
         def IsIterable():
             return HasAttr({'__iter__': IsCallable()})
 
-        def check_type(typ, to_check):
-            typecheck.check_type(typ, None, to_check)
-
         self.IsIterable = IsIterable
-        self.check_type = check_type
 
     def test_success_builtins(self):
-        IsIterable = self.IsIterable
-
         for t in (list, tuple, set, dict):
-            self.check_type(IsIterable(), t())
+            check_type(self.IsIterable(), t())
 
     def test_success_generator(self):
-        IsIterable = self.IsIterable
-
         def foo():
             yield 5
             yield 6
 
-        self.check_type(IsIterable(), foo())
+        check_type(self.IsIterable(), foo())
 
     def test_success_user_newstyle(self):
-        IsIterable = self.IsIterable
-
         class A(object):
             def __iter__(self):
                 yield 5
@@ -200,11 +181,9 @@ class IsIterable(TestCase):
                 return 5
 
         for c in (A, B):
-            self.check_type(IsIterable(), c())
+            check_type(self.IsIterable(), c())
 
     def test_success_user_oldstyle(self):
-        IsIterable = self.IsIterable
-
         class A:
             def __iter__(self):
                 yield 5
@@ -218,20 +197,18 @@ class IsIterable(TestCase):
                 return 5
 
         for c in (A, B):
-            self.check_type(IsIterable(), c())
+            check_type(self.IsIterable(), c())
 
     def test_failure(self):
         from typecheck import _TC_MissingAttrError
-
-        IsIterable = self.IsIterable
 
         class A(object):
             def __str__(self):
                 return "A()"
 
         try:
-            self.check_type(IsIterable(), A())
-        except _TC_MissingAttrError, e:
+            check_type(self.IsIterable(), A())
+        except _TC_MissingAttrError:
             pass
         else:
             raise AssertionError("Failed to raise _TC_MissingAttrError")
@@ -240,4 +217,4 @@ class IsIterable(TestCase):
 ### Bookkeeping ###
 if __name__ == '__main__':
     import __main__
-    support.run_all_tests(__main__)
+    run_all_tests(__main__)

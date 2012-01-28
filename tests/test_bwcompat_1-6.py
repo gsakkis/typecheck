@@ -1,11 +1,8 @@
-import support
-from support import TODO, TestCase
+from support import TestCase, adjust_path, run_all_tests
 
 if __name__ == '__main__':
-    support.adjust_path()
+    adjust_path()
 ### /Bookkeeping ###
-
-import types
 
 import typecheck.doctest_support
 from typecheck import typecheck, TypeCheckException, Any
@@ -86,10 +83,10 @@ class _TestSuite(TestCase):
 
     def testTypeCheckedDocstringGetsFoundByDoctest(self):
         import doctest
-        import doctests
+        import tests.doctests
 
         finder = doctest.DocTestFinder(verbose=True)
-        tests = finder.find(doctests)
+        tests = finder.find(tests.doctests)
 
         self.assertEquals(3, len(tests))
 
@@ -118,11 +115,11 @@ class _TestSuite(TestCase):
 
     def a_testTypeCheckMatchesKeywordsToPositionalNames(self):
         @typecheck(a=str)
-        def my_func(a):
+        def my_func1(a):
             pass
 
         try:
-            my_func(4, 7)
+            my_func1(4, 7)
             self.fail('Should have raised a TypeCheckException')
         except TypeCheckException:
             pass
@@ -130,11 +127,11 @@ class _TestSuite(TestCase):
             self.fail('Should have raised a TypeCheckException')
 
         @typecheck(a=str, b=int)
-        def my_func(a, b, c):
+        def my_func2(a, b, c):
             pass
 
         try:
-            my_func(4, 7, 7)
+            my_func2(4, 7, 7)
             self.fail('Should have raised a TypeCheckException')
         except TypeCheckException:
             pass
@@ -142,7 +139,7 @@ class _TestSuite(TestCase):
             self.fail('Should have raised a TypeCheckException')
 
         try:
-            my_func('4', 7, 7)
+            my_func2('4', 7, 7)
             self.fail('Should have raised a TypeCheckException')
         except TypeCheckException:
             pass
@@ -150,7 +147,7 @@ class _TestSuite(TestCase):
             self.fail('Should have raised a TypeCheckException')
 
         try:
-            my_func(4, '7', 7)
+            my_func2(4, '7', 7)
             self.fail('Should have raised a TypeCheckException')
         except TypeCheckException:
             pass
@@ -160,4 +157,4 @@ class _TestSuite(TestCase):
 ### Bookkeeping ###
 if __name__ == '__main__':
     import __main__
-    support.run_all_tests(__main__)
+    run_all_tests(__main__)

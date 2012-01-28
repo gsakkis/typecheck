@@ -1,13 +1,10 @@
-import support
-from support import TODO, TestCase, test_equality, test_hash
+from support import TestCase, test_equality, test_hash, adjust_path, run_all_tests
 
 if __name__ == '__main__':
-    support.adjust_path()
+    adjust_path()
 ### /Bookkeeping ###
 
 import typecheck
-
-import typecheck.sets
 from typecheck.sets import Set
 
 def check_type(typ, obj):
@@ -71,7 +68,7 @@ class SetTests(TestCase):
             raise AssertionError("Did not raise the proper exception")
 
     def test_failure_nested(self):
-        from typecheck import _TC_KeyError, _TC_IndexError, _TC_TypeError
+        from typecheck import _TC_KeyError, _TC_TypeError
 
         try:
             check_type(Set([(int, int)]), set([(4, 5), (4, 6.0)]))
@@ -135,4 +132,4 @@ class SetTests(TestCase):
 ### Bookkeeping ###
 if __name__ == '__main__':
     import __main__
-    support.run_all_tests(__main__)
+    run_all_tests(__main__)

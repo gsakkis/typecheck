@@ -1,11 +1,8 @@
-import support
-from support import TODO, TestCase, test_hash, test_equality
+from support import TestCase, test_hash, test_equality, adjust_path, run_all_tests
 
 if __name__ == '__main__':
-    support.adjust_path()
+    adjust_path()
 ### /Bookkeeping ###
-
-import types
 
 import typecheck
 
@@ -546,7 +543,7 @@ class Test_IsCallable(TestCase):
 
     def test_args_fail(self):
         from typecheck import typecheck_args, IsCallable
-        from typecheck import TypeCheckError, _TC_IndexError, _TC_TypeError
+        from typecheck import TypeCheckError, _TC_TypeError
 
         @typecheck_args(IsCallable())
         def foo(a):
@@ -853,7 +850,7 @@ class Test_YieldSeq(TestCase):
         g = foo(const, seq)
         h = foo(const, seq)
 
-        for obj in seq:
+        for _ in seq:
             assert g.next() == h.next()
 
     def test_failure_1(self):
@@ -1164,7 +1161,7 @@ class Test_Length(TestCase):
 
         try:
             Length('abc')
-        except:
+        except ValueError:
             pass
         else:
             raise AssertionError("Failed to raise an exception")
@@ -1500,7 +1497,7 @@ class Test_Typeclass(TestCase):
         for method in merged_intfc:
             assert method in tc_int.interface()
 
-    def test_intersect_1(self):
+    def test_intersect_2(self):
         """
         Make sure .intersect works on all iterables
         """
@@ -1589,4 +1586,4 @@ class Test_Typeclass(TestCase):
 ### Bookkeeping ###
 if __name__ == '__main__':
     import __main__
-    support.run_all_tests(__main__)
+    run_all_tests(__main__)
