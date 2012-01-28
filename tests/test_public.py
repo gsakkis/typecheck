@@ -1,5 +1,5 @@
 import sys
-from support import TODO, TestCase, adjust_path, run_all_tests
+from support import TestCase, adjust_path, run_all_tests
 
 if __name__ == '__main__':
     adjust_path()
@@ -1304,7 +1304,7 @@ class Test_Self_class(TestCase):
 
         assert Test.foo.type_args == {'self': Self(), 'a': int, 'b': Self()}
 
-    def test_self_in_args_fail_1(self):
+    def test_self_in_args_fail(self):
         from typecheck import typecheck_args, Self, TypeCheckError
         from typecheck import _TC_TypeError
 
@@ -1324,19 +1324,6 @@ class Test_Self_class(TestCase):
         else:
             raise AssertionError("Succeeded incorrectly")
 
-    @TODO("Waiting on some way of detecting method-hood in decorators")
-    def test_self_in_args_fail_2(self):
-        from typecheck import typecheck_args, Self, TypeSignatureError
-
-        try:
-            @typecheck_args(Self(), int)
-            def foo(a, b):
-                return a, b
-        except TypeSignatureError:
-            pass
-        else:
-            raise AssertionError("Succeeded incorrectly")
-
     def test_self_in_return_pass(self):
         from typecheck import typecheck_return, Self
 
@@ -1351,7 +1338,7 @@ class Test_Self_class(TestCase):
 
         assert Test.foo.type_return == (Self(), int, Self())
 
-    def test_self_in_return_fail_1(self):
+    def test_self_in_return_fail(self):
         from typecheck import typecheck_return, Self, TypeCheckError
         from typecheck import _TC_IndexError, _TC_TypeError
 
@@ -1374,43 +1361,6 @@ class Test_Self_class(TestCase):
 
         assert Test.foo.type_return == (Self(), int, Self())
 
-    @TODO("Waiting on some way of detecting method-hood in decorators")
-    def test_self_in_return_fail_2(self):
-        from typecheck import typecheck_return, Self, TypeSignatureError
-
-        try:
-            @typecheck_return(Self(), int)
-            def foo(self, a, b):
-                return a, b
-        except TypeSignatureError:
-            pass
-        else:
-            raise AssertionError("Succeeded incorrectly")
-
-    @TODO("Waiting on some way of detecting method-hood in decorators")
-    def test_self_in_return_fail_3(self):
-        from typecheck import typecheck_return, Self, TypeCheckError
-        from typecheck import _TC_IndexError, _TC_TypeError
-
-        class Test(object):
-            @typecheck_return(Self(), int, Self())
-            def foo(self, a, b):
-                return a, a, b
-
-        try:
-            t = Test()
-            assert t.foo(4, 6) == (4, 4, 6)
-        except TypeCheckError, e:
-            assert isinstance(e.internal, _TC_IndexError)
-            assert e.internal.index == 0
-            assert isinstance(e.internal.inner, _TC_TypeError)
-            assert e.internal.inner.wrong == int
-            assert e.internal.inner.right == Test
-        else:
-            raise AssertionError("Succeeded incorrectly")
-
-        assert Test.foo.type_return == (Self(), int, Self())
-
     def test_self_in_yield_pass(self):
         from typecheck import typecheck_yield, Self
 
@@ -1421,31 +1371,6 @@ class Test_Self_class(TestCase):
 
         t = Test()
         assert t.foo(4, 6).next() == (t, 4, t)
-        assert Test.foo.type_yield == (Self(), int, Self())
-
-    @TODO("Waiting on some way of detecting method-hood in decorators")
-    def test_self_in_yield_fail(self):
-        from typecheck import typecheck_yield, Self, TypeCheckError
-        from typecheck import _TC_IndexError, _TC_TypeError
-
-        class Test(object):
-            @typecheck_yield(Self(), int, Self())
-            def foo(self, a, b):
-                yield b, a, b
-
-        try:
-            assert Test().foo(4, 6).next() == (6, 4, 6)
-        except TypeCheckError, e:
-            assert isinstance(e.internal. _TC_GeneratorError)
-            assert e.internal.yield_no == 0
-            assert isinstance(e.internal.inner, _TC_IndexError)
-            assert e.internal.inner.index == 0
-            assert isinstance(e.internal.inner.inner, _TC_TypeError)
-            assert e.internal.inner.inner.wrong == int
-            assert e.internal.inner.inner.right == Test
-        else:
-            raise AssertionError("Succeeded incorrectly")
-
         assert Test.foo.type_yield == (Self(), int, Self())
 
     def test_self_in_args_yield_pass(self):
