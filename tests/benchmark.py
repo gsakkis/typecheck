@@ -3,13 +3,6 @@ A benchmark script to profile changes to typecheck's deep internals
 """
 
 import time
-
-### Bookkeeping ###
-from support import adjust_path
-if __name__ == '__main__':
-    adjust_path()
-### /Bookkeeping ###
-
 import typecheck
 from typecheck import accepts
 

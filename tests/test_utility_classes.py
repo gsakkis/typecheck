@@ -1,9 +1,4 @@
-from support import TestCase, test_hash, test_equality, adjust_path, run_all_tests
-
-if __name__ == '__main__':
-    adjust_path()
-### /Bookkeeping ###
-
+from support import TestCase
 import typecheck
 
 def check_type(typ, obj):
@@ -92,7 +87,7 @@ class Test_Or(TestCase):
             (Or(int, float), Or(int, float, str)),
             (Or(int, float), And(int, float)) ]
 
-        test_equality(eq_tests, ne_tests)
+        self.multipleAssertEqual(eq_tests, ne_tests)
 
     def test_hash(self):
         from typecheck import Or, And
@@ -111,7 +106,7 @@ class Test_Or(TestCase):
             (Or(int, float), Or(int, float, str)),
             (Or(int, float), And(int, float)) ]
 
-        test_hash(eq_tests, ne_tests)
+        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
 class Test_And(TestCase):
     def test_IsAllOf_alias(self):
@@ -167,7 +162,7 @@ class Test_And(TestCase):
             (And(int, float), And(int, float, str)),
             (And(int, float), Or(int, float)) ]
 
-        test_equality(eq_tests, ne_tests)
+        self.multipleAssertEqual(eq_tests, ne_tests)
 
     def test_hash(self):
         from typecheck import And, Or
@@ -187,7 +182,7 @@ class Test_And(TestCase):
             (And(int, float), And(int, float, str)),
             (And(int, float), Or(int, float)) ]
 
-        test_hash(eq_tests, ne_tests)
+        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
 class Test_Not(TestCase):
     def test_IsNoneOf_alias(self):
@@ -272,7 +267,7 @@ class Test_Not(TestCase):
             (Not(Not(int, str), float), Not(int, str, float)),
             (Not(Not(int, float), Not(str, int)), Not(int, float, str)) ]
 
-        test_equality(eq_tests, ne_tests)
+        self.multipleAssertEqual(eq_tests, ne_tests)
 
     def test_hash(self):
         from typecheck import Not, Or
@@ -292,7 +287,7 @@ class Test_Not(TestCase):
             (Not(Not(int, str), float), Not(int, str, float)),
             (Not(Not(int, float), Not(str, int)), Not(int, float, str)) ]
 
-        test_hash(eq_tests, ne_tests)
+        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
 class Test_Any(TestCase):
     def test_args_and_return_pass(self):
@@ -466,7 +461,7 @@ class Test_Empty(TestCase):
             (Empty(set), Empty(list)),
             (Empty(set), Empty(dict)), ]
 
-        test_equality(eq_tests, ne_tests)
+        self.multipleAssertEqual(eq_tests, ne_tests)
 
     def test_hash(self):
         from typecheck import Empty
@@ -481,7 +476,7 @@ class Test_Empty(TestCase):
             (Empty(list), Empty(set)),
             (Empty(dict), Empty(set)) ]
 
-        test_hash(eq_tests, ne_tests)
+        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
 class Test_IsCallable(TestCase):
     def test_accepts_no_args(self):
@@ -672,7 +667,7 @@ class Test_HasAttr(TestCase):
             (HasAttr(['a', 'b']), HasAttr(['a'], {'b': int})),
             (HasAttr({'a': HasAttr(['a'])}), HasAttr({'a': HasAttr(['b'])})), ]
 
-        test_equality(eq_tests, ne_tests, 100)
+        self.multipleAssertEqual(eq_tests, ne_tests, 100)
 
     def test_hash(self):
         from typecheck import HasAttr, Any
@@ -692,7 +687,7 @@ class Test_HasAttr(TestCase):
             (HasAttr(['a', 'b']), HasAttr(['a'], {'b': int})),
             (HasAttr({'a': HasAttr(['a'])}), HasAttr({'a': HasAttr(['b'])})), ]
 
-        test_hash(eq_tests, ne_tests, 100)
+        self.multipleAssertEqualHashes(eq_tests, ne_tests, 100)
 
 class Test_IsIterable(TestCase):
     def test_accepts_no_args(self):
@@ -919,7 +914,7 @@ class Test_YieldSeq(TestCase):
             (YieldSeq(int, float), And(int, float)),
             (YieldSeq(int, int, int, float), YieldSeq(int, float)) ]
 
-        test_equality(eq_tests, ne_tests)
+        self.multipleAssertEqual(eq_tests, ne_tests)
 
     def test_hash(self):
         from typecheck import YieldSeq, And
@@ -936,7 +931,7 @@ class Test_YieldSeq(TestCase):
             (YieldSeq(int, float), And(int, float)),
             (YieldSeq(int, int, int, float), YieldSeq(int, float)) ]
 
-        test_hash(eq_tests, ne_tests)
+        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
 class Test_Xor(TestCase):
     def test_IsOnlyOneOf_alias(self):
@@ -1018,7 +1013,7 @@ class Test_Xor(TestCase):
             (Xor(int, float), Xor(int, float, str)),
             (Xor(int, float), Or(int, float)) ]
 
-        test_equality(eq_tests, ne_tests)
+        self.multipleAssertEqual(eq_tests, ne_tests)
 
     def test_hash(self):
         from typecheck import Xor, Or
@@ -1038,7 +1033,7 @@ class Test_Xor(TestCase):
             (Xor(int, float), Xor(int, float, str)),
             (Xor(int, float), Or(int, float)) ]
 
-        test_hash(eq_tests, ne_tests)
+        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
 class Test_Exact(TestCase):
     def test_constructor(self):
@@ -1072,7 +1067,7 @@ class Test_Exact(TestCase):
                     (Exact(Exact), Exact(object)),
                     (Exact(object), Exact(dict)) ]
 
-        test_equality(eq_tests, ne_tests)
+        self.multipleAssertEqual(eq_tests, ne_tests)
 
     def test_hash(self):
         from typecheck import Exact
@@ -1089,7 +1084,7 @@ class Test_Exact(TestCase):
                     (Exact(object), Exact(dict)),
                     (Exact([5, 4]), Exact(set([]))) ]
 
-        test_hash(eq_tests, ne_tests)
+        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
     def test_pass(self):
         from typecheck import Exact, Or
@@ -1172,7 +1167,7 @@ class Test_Length(TestCase):
         eq_tests = [(Length(4), Length(4)), (Length(4.0), Length(4))]
         ne_tests = [(Length(5), Length(4))]
 
-        test_equality(eq_tests, ne_tests)
+        self.multipleAssertEqual(eq_tests, ne_tests)
 
     def test_hash(self):
         from typecheck import Length
@@ -1180,7 +1175,7 @@ class Test_Length(TestCase):
         eq_tests = [(Length(4), Length(4)), (Length(4.0), Length(4))]
         ne_tests = [(Length(5), Length(4))]
 
-        test_hash(eq_tests, ne_tests)
+        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
     def test_pass_builtins(self):
         from typecheck import Length
@@ -1477,9 +1472,7 @@ class Test_Typeclass(TestCase):
         assert dict in tc.instances()
 
     def test_intersect_1(self):
-        """
-        Make sure .intersect works on other Typeclass instances
-        """
+        # Make sure .intersect works on other Typeclass instances
         from typecheck import Typeclass
 
         tc_int = Typeclass(int)
@@ -1498,9 +1491,7 @@ class Test_Typeclass(TestCase):
             assert method in tc_int.interface()
 
     def test_intersect_2(self):
-        """
-        Make sure .intersect works on all iterables
-        """
+        # Make sure .intersect works on all iterables
         from typecheck import Typeclass
 
         tc_int = Typeclass(int)
@@ -1536,7 +1527,7 @@ class Test_Typeclass(TestCase):
 
         ne_tests = [ (Typeclass(int), Typeclass(float)) ]
 
-        test_equality(eq_tests, ne_tests)
+        self.multipleAssertEqual(eq_tests, ne_tests)
 
     def test_hash(self):
         from typecheck import Typeclass
@@ -1548,7 +1539,7 @@ class Test_Typeclass(TestCase):
 
         ne_tests = [ (Typeclass(int), Typeclass(float)) ]
 
-        test_hash(eq_tests, ne_tests)
+        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
     def test_cope_with_class_changes(self):
         from typecheck import Typeclass, _TC_AttrError, _TC_TypeError
@@ -1582,8 +1573,3 @@ class Test_Typeclass(TestCase):
             assert e.inner.wrong == int
         else:
             raise AssertionError("Failed to raise _TC_AttrError")
-
-### Bookkeeping ###
-if __name__ == '__main__':
-    import __main__
-    run_all_tests(__main__)

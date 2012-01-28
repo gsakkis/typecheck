@@ -1,9 +1,4 @@
-from support import TestCase, adjust_path, run_all_tests
-
-if __name__ == '__main__':
-    adjust_path()
-### /Bookkeeping ###
-
+from support import TestCase
 import typecheck
 
 def check_type(typ, to_check):
@@ -212,9 +207,3 @@ class IsIterableCase(TestCase):
             pass
         else:
             raise AssertionError("Failed to raise _TC_MissingAttrError")
-
-
-### Bookkeeping ###
-if __name__ == '__main__':
-    import __main__
-    run_all_tests(__main__)

@@ -1,9 +1,4 @@
-from support import TestCase, test_equality, test_hash, adjust_path, run_all_tests
-
-if __name__ == '__main__':
-    adjust_path()
-### /Bookkeeping ###
-
+from support import TestCase
 import typecheck
 from typecheck.sets import Set
 
@@ -100,7 +95,7 @@ class SetTests(TestCase):
             (Set([Set([int, str])]), Set([Set([Set([int, str])])])),
             (Set([int, int]), set([int, int])) ]
 
-        test_equality(eq_tests, ne_tests)
+        self.multipleAssertEqual(eq_tests, ne_tests)
 
     def test_hash(self):
         class A(object): pass
@@ -121,15 +116,10 @@ class SetTests(TestCase):
             (Set([]), Set([int, int])),
             (Set([Set([int, str])]), Set([Set([Set([int, str])])])) ]
 
-        test_hash(eq_tests, ne_tests)
+        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
     def test_Type_uses_it(self):
         from typecheck import Type
 
         t = Type(set([int, float]))
         assert isinstance(t, Set)
-
-### Bookkeeping ###
-if __name__ == '__main__':
-    import __main__
-    run_all_tests(__main__)

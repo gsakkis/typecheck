@@ -1,8 +1,4 @@
-from support import TestCase, adjust_path, run_all_tests
-
-if __name__ == '__main__':
-    adjust_path()
-### /Bookkeeping ###
+from support import TestCase
 
 class UnorderedIteratorMixinTests(TestCase):
     def setUp(self):
@@ -68,8 +64,3 @@ class UnorderedIteratorMixinTests(TestCase):
             self.assertEqual(str(e), "Argument itr: for MyIterator(5, 6, 9.0, 4, 'four'), at iteration 4 (value: 'four'), expected Or(<type 'float'>, <type 'int'>), got <type 'str'>")
         else:
             raise AssertionError("Succeeded incorrectly")
-
-### Bookkeeping ###
-if __name__ == '__main__':
-    import __main__
-    run_all_tests(__main__)

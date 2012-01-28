@@ -1,12 +1,6 @@
 import sys
-from support import TestCase, adjust_path, run_all_tests
-
-if __name__ == '__main__':
-    adjust_path()
-### /Bookkeeping ###
-
 import types
-
+from support import TestCase
 import typecheck
 
 class Test_typecheck_return(TestCase):
@@ -1793,8 +1787,3 @@ class Test_hooks_ignore_enable_checking(Test_signature_checking_hooks):
     def tearDown(self):
         Test_signature_checking_hooks.tearDown(self)
         typecheck.enable_checking = True
-
-### Bookkeeping ###
-if __name__ == '__main__':
-    import __main__
-    run_all_tests(__main__)

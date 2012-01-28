@@ -1,9 +1,4 @@
-from support import TestCase, test_hash, test_equality, adjust_path, run_all_tests
-
-if __name__ == '__main__':
-    adjust_path()
-### /Bookkeeping ###
-
+from support import TestCase
 import typecheck
 
 def check_type(typ, obj):
@@ -62,7 +57,7 @@ class SingleTests(TestCase):
             (Single(int), Single(float)),
             (Single(A), Single(B)) ]
 
-        test_equality(eq_tests, ne_tests)
+        self.multipleAssertEqual(eq_tests, ne_tests)
 
     def test_hash(self):
         from typecheck import Single
@@ -79,7 +74,7 @@ class SingleTests(TestCase):
             (Single(int), Single(float)),
             (Single(A), Single(B)) ]
 
-        test_hash(eq_tests, ne_tests)
+        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
 class DictTests(TestCase):
     def setUp(self):
@@ -148,7 +143,7 @@ class DictTests(TestCase):
             (Dict(str, int), {'a': 5}),
             (Dict(str, Dict(str, int)), Dict(str, Dict(int, str))) ]
 
-        test_equality(eq_tests, ne_tests)
+        self.multipleAssertEqual(eq_tests, ne_tests)
 
     def test_hash(self):
         from typecheck import Dict
@@ -164,7 +159,7 @@ class DictTests(TestCase):
             (Dict(str, int), Dict(int, str)),
             (Dict(str, Dict(str, int)), Dict(str, Dict(int, str))) ]
 
-        test_hash(eq_tests, ne_tests)
+        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
 class TupleTests(TestCase):
     def setUp(self):
@@ -232,7 +227,7 @@ class TupleTests(TestCase):
             (Tuple(str, int, float), Tuple()),
             (Tuple(str, Tuple(str, int)), Tuple(str, Tuple(int, str))) ]
 
-        test_equality(eq_tests, ne_tests)
+        self.multipleAssertEqual(eq_tests, ne_tests)
 
     def test_hash(self):
         from typecheck import Tuple
@@ -252,7 +247,7 @@ class TupleTests(TestCase):
             (Tuple(str, int, float), Tuple()),
             (Tuple(str, Tuple(str, int)), Tuple(str, Tuple(int, str))) ]
 
-        test_hash(eq_tests, ne_tests)
+        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
     def test_empty_tuple_success(self):
         from typecheck import Tuple
@@ -327,7 +322,7 @@ class SingleType_ListTests(TestCase):
             (List(int), List(int, int)),
             (List(int), [int]) ]
 
-        test_equality(eq_tests, ne_tests)
+        self.multipleAssertEqual(eq_tests, ne_tests)
 
     def test_hash(self):
         from typecheck import List
@@ -348,7 +343,7 @@ class SingleType_ListTests(TestCase):
             (List(List(int)), List(List(List(int)))),
             (List(int), List(int, int)) ]
 
-        test_hash(eq_tests, ne_tests)
+        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
 class Pattern_ListTests(TestCase):
     def setUp(self):
@@ -420,7 +415,7 @@ class Pattern_ListTests(TestCase):
             (List(int, int), List(int, int, int)),
             (List(int, int), [int, int]) ]
 
-        test_equality(eq_tests, ne_tests)
+        self.multipleAssertEqual(eq_tests, ne_tests)
 
     def test_hash(self):
         from typecheck import List
@@ -441,7 +436,7 @@ class Pattern_ListTests(TestCase):
             (List(List(int, int)), List(List(List(int, int)))),
             (List(int, int), List(int, int, int)) ]
 
-        test_hash(eq_tests, ne_tests)
+        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
 class NestedTests(TestCase):
     def test_patterned_lists_in_lists(self):
@@ -1481,8 +1476,3 @@ class Test_TypeVariables(TestCase):
             return a
 
         assert bar(4) == float(4)
-
-### Bookkeeping ###
-if __name__ == '__main__':
-    import __main__
-    run_all_tests(__main__)

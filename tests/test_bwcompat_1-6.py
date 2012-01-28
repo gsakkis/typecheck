@@ -1,13 +1,8 @@
-from support import TestCase, adjust_path, run_all_tests
-
-if __name__ == '__main__':
-    adjust_path()
-### /Bookkeeping ###
-
+from support import TestCase
 import typecheck.doctest_support
 from typecheck import typecheck, TypeCheckException, Any
 
-class _TestSuite(TestCase):
+class TestSuite(TestCase):
     def testCreateTypeCheckedMethod(self):
         @typecheck(int)
         def f(a):
@@ -83,10 +78,10 @@ class _TestSuite(TestCase):
 
     def testTypeCheckedDocstringGetsFoundByDoctest(self):
         import doctest
-        import tests.doctests
+        import doctests
 
         finder = doctest.DocTestFinder(verbose=True)
-        tests = finder.find(tests.doctests)
+        tests = finder.find(doctests)
 
         self.assertEquals(3, len(tests))
 
@@ -108,53 +103,48 @@ class _TestSuite(TestCase):
 
     ##########################################################################
 
-    def a_testTypeCheckMatchesKwToPnIfNoCorrespondingKw(self):
-        @typecheck(b=str)
-        def my_func(a, b):
-            pass
-
-    def a_testTypeCheckMatchesKeywordsToPositionalNames(self):
-        @typecheck(a=str)
-        def my_func1(a):
-            pass
-
-        try:
-            my_func1(4, 7)
-            self.fail('Should have raised a TypeCheckException')
-        except TypeCheckException:
-            pass
-        except:
-            self.fail('Should have raised a TypeCheckException')
-
-        @typecheck(a=str, b=int)
-        def my_func2(a, b, c):
-            pass
-
-        try:
-            my_func2(4, 7, 7)
-            self.fail('Should have raised a TypeCheckException')
-        except TypeCheckException:
-            pass
-        except:
-            self.fail('Should have raised a TypeCheckException')
-
-        try:
-            my_func2('4', 7, 7)
-            self.fail('Should have raised a TypeCheckException')
-        except TypeCheckException:
-            pass
-        except:
-            self.fail('Should have raised a TypeCheckException')
-
-        try:
-            my_func2(4, '7', 7)
-            self.fail('Should have raised a TypeCheckException')
-        except TypeCheckException:
-            pass
-        except:
-            self.fail('Should have raised a TypeCheckException')
-
-### Bookkeeping ###
-if __name__ == '__main__':
-    import __main__
-    run_all_tests(__main__)
+    #def testTypeCheckMatchesKwToPnIfNoCorrespondingKw(self):
+    #    @typecheck(b=str)
+    #    def my_func(a, b):
+    #        pass
+    #
+    #def testTypeCheckMatchesKeywordsToPositionalNames(self):
+    #    @typecheck(a=str)
+    #    def my_func1(a):
+    #        pass
+    #
+    #    try:
+    #        my_func1(4, 7)
+    #        self.fail('Should have raised a TypeCheckException')
+    #    except TypeCheckException:
+    #        pass
+    #    except:
+    #        self.fail('Should have raised a TypeCheckException')
+    #
+    #    @typecheck(a=str, b=int)
+    #    def my_func2(a, b, c):
+    #        pass
+    #
+    #    try:
+    #        my_func2(4, 7, 7)
+    #        self.fail('Should have raised a TypeCheckException')
+    #    except TypeCheckException:
+    #        pass
+    #    except:
+    #        self.fail('Should have raised a TypeCheckException')
+    #
+    #    try:
+    #        my_func2('4', 7, 7)
+    #        self.fail('Should have raised a TypeCheckException')
+    #    except TypeCheckException:
+    #        pass
+    #    except:
+    #        self.fail('Should have raised a TypeCheckException')
+    #
+    #    try:
+    #        my_func2(4, '7', 7)
+    #        self.fail('Should have raised a TypeCheckException')
+    #    except TypeCheckException:
+    #        pass
+    #    except:
+    #        self.fail('Should have raised a TypeCheckException')
