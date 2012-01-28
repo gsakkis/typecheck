@@ -1,3 +1,4 @@
+import sys
 import support
 from support import TODO, TestCase
 
@@ -791,7 +792,10 @@ class Test_typecheck_args(TestCase):
         try:
             foo(5, (6, 4), 9)
         except TypeError, e:
-            self.assertEqual(str(e), "unpack non-sequence")
+            if sys.version_info[:2] >= (2, 5):
+                self.assertEqual(str(e), "'int' object is not iterable")
+            else:
+                self.assertEqual(str(e), "unpack non-sequence")
         else:
             raise AssertionError("Succeeded incorrectly")
 

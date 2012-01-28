@@ -4,7 +4,8 @@ import sys
 import os.path
 import time
 
-from unittest import _strclass
+def _strclass(cls):
+    return "%s.%s" % (cls.__module__, cls.__name__)
 
 def run_all_tests(test_mod=None, tests=None):
     if tests is None:
