@@ -3,15 +3,15 @@
 # - Hacked up by Iain to allow integration with the _unittest module
 # - Further hacked up by Collin Winter (2005.11.16) to work with his own testsuite
 
-from typecheck import typecheck
+from typecheck import accepts
 
-@typecheck(str)
+@accepts(str)
 def checker(aString):
     """
-    >>> print [x for x in globals().copy() if not x.startswith('_')]
-    ['checker2', 'typecheck', 'checker', 'Rational', 'testMyClass', 'MyTestClass']
-    >>> print [x for x in locals().copy() if not x.startswith('_')]
-    ['checker2', 'typecheck', 'checker', 'Rational', 'testMyClass', 'x', 'MyTestClass']
+    >>> print sorted([x for x in globals().copy() if not x.startswith('_')])
+    ['MyTestClass', 'Rational', 'accepts', 'checker', 'checker2', 'testMyClass']
+    >>> print sorted([x for x in locals().copy() if not x.startswith('_')])
+    ['MyTestClass', 'Rational', 'accepts', 'checker', 'checker2', 'testMyClass', 'x']
     >>> checker('Nonsense')
     2
     """
@@ -23,9 +23,9 @@ def checker(aString):
 def checker2(aString):
     """
     >>> print sorted([x for x in globals().copy() if not x.startswith('_')])
-    ['MyTestClass', 'Rational', 'checker', 'checker2', 'testMyClass', 'typecheck']
+    ['MyTestClass', 'Rational', 'accepts', 'checker', 'checker2', 'testMyClass']
     >>> print sorted([x for x in locals().copy() if not x.startswith('_')])
-    ['MyTestClass', 'Rational', 'checker', 'checker2', 'testMyClass', 'typecheck', 'x']
+    ['MyTestClass', 'Rational', 'accepts', 'checker', 'checker2', 'testMyClass', 'x']
     >>> checker2('Nonsense')
     2
     """
@@ -35,13 +35,13 @@ def checker2(aString):
         return 2
 
 class Rational(object):
-    @typecheck(object, int, int)
+    @accepts(object, int, int)
     def __init__(self, numerator, denumerator):
         self.p = numerator
         self.q = denumerator
 
 class MyTestClass:
-    @typecheck(object, int, Rational)
+    @accepts(object, int, Rational)
     def __init__(self, a, b):
         pass
 

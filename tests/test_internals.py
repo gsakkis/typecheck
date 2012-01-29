@@ -693,9 +693,9 @@ class ExtensibleSigTests(TestCase):
             unregister_type(self.ExactValue)
 
     def test_register(self):
-        from typecheck import typecheck_args, TypeCheckError, _TC_TypeError
+        from typecheck import accepts, TypeCheckError, _TC_TypeError
 
-        @typecheck_args(5, 6)
+        @accepts(5, 6)
         def foo(a, b):
             return a, b
 
@@ -716,10 +716,10 @@ class ExtensibleSigTests(TestCase):
         register_type(self.ExactValue)
 
     def test_unregister_def(self):
-        from typecheck import typecheck_args
+        from typecheck import accepts
         from typecheck import unregister_type
 
-        @typecheck_args(5, 6)
+        @accepts(5, 6)
         def foo(a, b):
             return a, b
 
@@ -728,7 +728,7 @@ class ExtensibleSigTests(TestCase):
         unregister_type(self.ExactValue)
 
         try:
-            @typecheck_args(5, 6)
+            @accepts(5, 6)
             def bar(a, b):
                 return a, b
         except AssertionError:
@@ -737,10 +737,10 @@ class ExtensibleSigTests(TestCase):
             raise AssertionError("Succeeded incorrectly")
 
     def test_unregister_call_again(self):
-        from typecheck import typecheck_args, unregister_type, TypeCheckError
+        from typecheck import accepts, unregister_type, TypeCheckError
         from typecheck import _TC_TypeError
 
-        @typecheck_args(5, 6)
+        @accepts(5, 6)
         def foo(a, b):
             return a, b
 

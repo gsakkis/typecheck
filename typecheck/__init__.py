@@ -1253,7 +1253,7 @@ class TypeSignatureError(Exception):
     def __str__(self):
         return self.__message
 
-### Begin helper classes/functions for typecheck_args
+### Begin helper classes/functions for accepts
 #####################################################
 def _rec_tuple(obj):
     if isinstance(obj, list):
@@ -1386,7 +1386,7 @@ def _make_fake_function(func):
     def fake_function(*vargs, **kwargs):
         # We call start_checking here, but __check_result
         # has to call stop_checking on its own. The reason
-        # for this is so that typecheck_yield can call
+        # for this is so that yields can call
         # stop_checking on the function and then start_checking
         # on the generator
         start_checking(func)
@@ -1423,10 +1423,10 @@ def _make_fake_function(func):
     return fake_function
 
 ###################################################
-### End helper classes/functions for typecheck_args
+### End helper classes/functions for accepts
 
-def typecheck_args(*v_sig, **kw_sig):
-    # typecheck_args is run to obtain the real decorator
+def accepts(*v_sig, **kw_sig):
+    # accepts is run to obtain the real decorator
     def decorator(func):
         if hasattr(func, '__wrapped_func'):
             if hasattr(func, 'type_args'):
@@ -1477,7 +1477,7 @@ def typecheck_args(*v_sig, **kw_sig):
 
         if hasattr(func, '__check_result'):
             # This is one of our wrapper functions, probably created by
-            # typecheck_yield or typecheck_return
+            # yields or returns
             fake_function = func
         else:
             # We need to build a wrapper
@@ -1497,9 +1497,9 @@ def _decorator(signature, conflict_field, twice_field, check_result_func):
     def decorator(func):
         if hasattr(func, '__check_result'):
             # This is one of our wrapper functions, probably created by
-            # typecheck_args
+            # accepts
             if hasattr(func, conflict_field):
-                raise RuntimeError("Cannot use typecheck_return and typecheck_yield on the same function")
+                raise RuntimeError("Cannot use returns and yields on the same function")
             elif hasattr(func, twice_field):
                 raise RuntimeError('Cannot use the same typecheck_* function more than once on the same function')
 
@@ -1512,7 +1512,7 @@ def _decorator(signature, conflict_field, twice_field, check_result_func):
         return fake_function
     return decorator
 
-def typecheck_return(*signature):
+def returns(*signature):
     if len(signature) == 1:
         signature = signature[0]
     sig_types = Type(signature)
@@ -1571,7 +1571,7 @@ class Fake_generator(object):
         if self.__needs_stopping:
             stop_checking(self.__real_gen)
 
-def typecheck_yield(*signature):
+def yields(*signature):
     if len(signature) == 1:
         signature = signature[0]
 
@@ -1579,7 +1579,7 @@ def typecheck_yield(*signature):
         # If the return value isn't a generator, we blow up
         if not isinstance(gen, types.GeneratorType):
             stop_checking(func)
-            raise TypeError("typecheck_yield only works for generators")
+            raise TypeError("yields only works for generators")
 
         # Inform all listening classes that they might want to preserve any information
         # from the function to the generator (*hint* TypeVariables *hint*)
@@ -1591,9 +1591,3 @@ def typecheck_yield(*signature):
         # Otherwise, we build ourselves a fake generator
         return Fake_generator(gen, signature)
     return _decorator(signature, 'type_return', 'type_yield', __check_yield)
-
-# Aliases
-typecheck = typecheck_args
-accepts = typecheck_args
-returns = typecheck_return
-yields = typecheck_yield

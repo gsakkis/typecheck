@@ -291,7 +291,7 @@ class Test_Not(TestCase):
 
 class Test_Any(TestCase):
     def test_args_and_return_pass(self):
-        from typecheck import typecheck_args, typecheck_return, Any
+        from typecheck import accepts, returns, Any
 
         def run_test(dec):
             @dec(Any())
@@ -302,13 +302,13 @@ class Test_Any(TestCase):
             assert foo(5) == 5
             assert foo(([], [], 5)) == ([], [], 5)
 
-        run_test(typecheck_args)
-        run_test(typecheck_return)
+        run_test(accepts)
+        run_test(returns)
 
     def test_yield_pass(self):
-        from typecheck import typecheck_yield, Any
+        from typecheck import yields, Any
 
-        @typecheck_yield(Any())
+        @yields(Any())
         def foo(a):
             yield a
 
@@ -537,10 +537,10 @@ class Test_IsCallable(TestCase):
         check_type(IsCallable(), A())
 
     def test_args_fail(self):
-        from typecheck import typecheck_args, IsCallable
+        from typecheck import accepts, IsCallable
         from typecheck import TypeCheckError, _TC_TypeError
 
-        @typecheck_args(IsCallable())
+        @accepts(IsCallable())
         def foo(a):
             return a
 
@@ -796,9 +796,9 @@ class Test_YieldSeq(TestCase):
             raise AssertionError("Did not raise TypeError")
 
     def test_success(self):
-        from typecheck import YieldSeq, typecheck_yield
+        from typecheck import YieldSeq, yields
 
-        @typecheck_yield(int, YieldSeq(int, int, float))
+        @yields(int, YieldSeq(int, int, float))
         def foo(const, seq):
             for o in seq:
                 yield (const, o)
@@ -811,14 +811,14 @@ class Test_YieldSeq(TestCase):
             assert g.next() == (const, obj)
 
     def test_nested_success(self):
-        from typecheck import YieldSeq, typecheck_yield
+        from typecheck import YieldSeq, yields
 
-        @typecheck_yield(YieldSeq(float, str, str))
+        @yields(YieldSeq(float, str, str))
         def bar(seq):
             for o in seq:
                 yield o
 
-        @typecheck_yield(YieldSeq(float, str, str), YieldSeq(int, int, float))
+        @yields(YieldSeq(float, str, str), YieldSeq(int, int, float))
         def foo(seq_1, seq_2):
             g = bar(seq_1)
 
@@ -833,9 +833,9 @@ class Test_YieldSeq(TestCase):
             assert g.next() == tup
 
     def test_parallel_success(self):
-        from typecheck import YieldSeq, typecheck_yield
+        from typecheck import YieldSeq, yields
 
-        @typecheck_yield(int, YieldSeq(int, int, float))
+        @yields(int, YieldSeq(int, int, float))
         def foo(const, seq):
             for o in seq:
                 yield (const, o)
@@ -849,11 +849,11 @@ class Test_YieldSeq(TestCase):
             assert g.next() == h.next()
 
     def test_failure_1(self):
-        from typecheck import YieldSeq, typecheck_yield
+        from typecheck import YieldSeq, yields
         from typecheck import TypeCheckError, _TC_GeneratorError
         from typecheck import _TC_TypeError
 
-        @typecheck_yield(YieldSeq(int, int, float))
+        @yields(YieldSeq(int, int, float))
         def foo():
             yield 5
             yield 7.0
@@ -874,11 +874,11 @@ class Test_YieldSeq(TestCase):
             raise AssertionError("Did not raise TypeCheckError")
 
     def test_failure_2(self):
-        from typecheck import YieldSeq, typecheck_yield
+        from typecheck import YieldSeq, yields
         from typecheck import TypeCheckError, _TC_GeneratorError
         from typecheck import _TC_YieldCountError
 
-        @typecheck_yield(YieldSeq(int, float))
+        @yields(YieldSeq(int, float))
         def foo():
             yield 5
             yield 7.0
@@ -1266,11 +1266,11 @@ class Test_Class(TestCase):
         assert hash(classb_1) == hash(classb_2)
 
     def test_no_class(self):
-        from typecheck import Class, typecheck_args
+        from typecheck import Class, accepts
 
         ClassB = Class("ClassB")
 
-        @typecheck_args(ClassB)
+        @accepts(ClassB)
         def foo(a):
             return a
 
@@ -1282,17 +1282,17 @@ class Test_Class(TestCase):
             raise AssertionError("Failed to raise NameError")
 
     def test_success(self):
-        from typecheck import Class, typecheck_args, Self
+        from typecheck import Class, accepts, Self
 
         ClassB = Class("ClassB")
 
         class ClassA(object):
-            @typecheck_args(Self(), ClassB)
+            @accepts(Self(), ClassB)
             def foo(self, a):
                 return a
 
         class ClassB(object):
-            @typecheck_args(Self(), ClassA)
+            @accepts(Self(), ClassA)
             def foo(self, a):
                 return a
 
@@ -1300,18 +1300,18 @@ class Test_Class(TestCase):
         ClassB().foo(ClassA())
 
     def test_failure(self):
-        from typecheck import Class, typecheck_args, Self
+        from typecheck import Class, accepts, Self
         from typecheck import TypeCheckError, _TC_TypeError
 
         ClassB = Class("ClassB")
 
         class ClassA(object):
-            @typecheck_args(Self(), ClassB)
+            @accepts(Self(), ClassB)
             def foo(self, a):
                 return a
 
         class ClassB(object):
-            @typecheck_args(Self(), ClassA)
+            @accepts(Self(), ClassA)
             def foo(self, a):
                 return a
 

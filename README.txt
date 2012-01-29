@@ -3,8 +3,8 @@ typecheck - A runtime typechecking module for Python
 typecheck is Python module providing run-time typechecking facilities for
 function parameters and return values.
 
-The main workhorses of this module, the functions typecheck_args,
-typecheck_return and typecheck_yield, are used as function/method decorators
+The main workhorses of this module, the functions accepts,
+returns and yields, are used as function/method decorators
 (see Examples section).
 
 A number of utility classes are provided to assist in building more complex
@@ -40,12 +40,12 @@ individually.
 
 ### Examples
 
-@typecheck_args( (int, str) )
-	
+@accepts( (int, str) )
+
 	Takes a two-tuple composed of an integer and a string
 
 
-@typecheck_args( [int, int, str] )
+@accepts( [int, int, str] )
 
 	Takes a list, with types in a repeating pattern of integer, integer,
 	string.
@@ -54,186 +54,186 @@ individually.
 	[3, 4, 'f', 5, 6] do not because they do not complete the pattern.
 
 
-@typecheck_args( [(int, str)] )
-	
+@accepts( [(int, str)] )
+
 	Takes a list of int+str two-tuples
 
-	
-@typecheck_args( int, str, f=SomeRandomType )
+
+@accepts( int, str, f=SomeRandomType )
 
 	Keyword arguments are supported
 
 
-@typecheck_args( { str : int } )
+@accepts( { str : int } )
 
 	Takes a dictionary where all keys must be strings and all values must be
 	integers.
-	This can also be spelled as @typecheck_args( Dict(str, int) )
+	This can also be spelled as @accepts( Dict(str, int) )
 
-	
-@typecheck_args( int, Or(int, str, SomeRandomType) )
+
+@accepts( int, Or(int, str, SomeRandomType) )
 
 	Takes two arguments, the second of which may be either an integer, a
 	string or an instance of SomeRandomClass.
 
-	
-@typecheck_args( int, And(ClassA, ClassB, ClassC) )
+
+@accepts( int, And(ClassA, ClassB, ClassC) )
 
 	Takes two arguments, the second of which must be an instance of a subtype
 	of ClassA, ClassB and ClassC
-	
 
-@typecheck_args( Not(int, float) )
+
+@accepts( Not(int, float) )
 
 	Takes a single argument which can be neither an int or a float.
 
 
-@typecheck_args( Xor(ClassA, ClassB) )
+@accepts( Xor(ClassA, ClassB) )
 
 	The argument must be an instance of either ClassA or ClassB, but not both;
 	this would preclude instances of ClassC(ClassA, ClassB).
 
 
-@typecheck_args( { (int, int): float } )
+@accepts( { (int, int): float } )
 
 	The dictionary's keys must be 2-tuples of integers
 
-	
-@typecheck_args( (int, int), int )
+
+@accepts( (int, int), int )
 def foo((a, b), c):
 	...
 
 	Automatically unpacked tuples are also supported
 
 
-@typecheck_args(int, int, int, int):
+@accepts(int, int, int, int):
 def foo(a, b, *vargs, **kwargs):
 	...
-@typecheck_args(int, int, [int], {str: int})
+@accepts(int, int, [int], {str: int})
 def foo(a, b, *vargs, **kwargs):
 	...
-@typecheck_args(int, int, vargs=int, kwargs=int)
+@accepts(int, int, vargs=int, kwargs=int)
 def foo(a, b, *vargs, **kwargs):
 	...
-@typecheck_args(int, int, vargs=[int], kwargs={str: int})
+@accepts(int, int, vargs=[int], kwargs={str: int})
 def foo(a, b, *vargs, **kwargs):
-	
+
 	All four of the above signatures are identical. They say that
 	there are two mandatory ints (a and b), then all extra positional
 	arguments must be ints and all extra keyword arguments must also be
 	ints.
-	
+
 	The first and third forms are coerced into the second and fourth
 	forms, respectively.
 
 
-@typecheck_args(int, int)
+@accepts(int, int)
 def foo(a, b):
 	return a, b
 foo(4, 5.0)
 
-	typecheck_args will raise a TypeCheckError with an error message
+	accepts will raise a TypeCheckError with an error message
 	indicating exactly where the badly-typed object is.
 
-	
-@typecheck_args(int, int, int)
+
+@accepts(int, int, int)
 def foo(a, b, (c, d)):
 	return a, b, c, d
 
-	This will cause typecheck_args to raise a TypeSignatureError, indicating
+	This will cause accepts to raise a TypeSignatureError, indicating
 	that the provided signature does not match the shape of the arguments
 	expected by the function.
 
 
 class Foo:
-	@typecheck_args(Self(), int, int)
-	@typecheck_return(int, int, Self())
+	@accepts(Self(), int, int)
+	@returns(int, int, Self())
 	def foo(self, a, b):
 		return a, b, self
-		
+
 	A special Self callable may be imported from the typecheck module that
 	serves as a placeholder in method signatures.
 
-	Self can also be used with typecheck_return.
+	Self can also be used with returns.
 
 
-@typecheck_args(Any(), int, Any())
+@accepts(Any(), int, Any())
 
 	This signature indicates that any type of object may be provided for the
 	first and third parameters.
 	Note the () after Any; its use is similar to that of Or() and And().
 
-	
-@typecheck_yield(int)
+
+@yields(int)
 def foo(a):
 	yield a+1
 	yield a+2
 	yield a+3
 
-	typecheck_yield is a version of typecheck_return, but specifically written
-	to handle generators. In fact, if you use typecheck_yield to decorate a
+	yields is a version of returns, but specifically written
+	to handle generators. In fact, if you use yields to decorate a
 	non-generator, it will blow up.
 
 
-@typecheck_args(int)
-@typecheck_yield(int)
+@accepts(int)
+@yields(int)
 def foo(a):
 	yield a+1
 	yield a+2
 	yield a+3
-	
-	typecheck_yield can be used in conjunction with typecheck_args
 
-	
-@typecheck_args(IsIterable())
+	yields can be used in conjunction with accepts
+
+
+@accepts(IsIterable())
 def foo(seq):
 	for obj in seq:
 		yield obj
-		
+
 	This signature demands that `seq` be of a type valid for use in a for
 	statement
 
 
-@typecheck_args(IsCallable())
+@accepts(IsCallable())
 def foo(func):
 	return func()
-	
-	Assert that callable(func) returns True
-	
 
-@typecheck_args(HasAttr(['foo', 'bar']))
+	Assert that callable(func) returns True
+
+
+@accepts(HasAttr(['foo', 'bar']))
 def foo(obj):
 	...
-	
+
 	Demand that `obj` has attributes `foo` and `bar` without caring about
 	their types
-	
-@typecheck_args(HasAttr({'foo': int, 'bar': int}))
-def foo(obj):
-	...
-	
-	Insist that `obj` have attributes `foo` and `bar` and that they're both
-	integers	
 
-@typecheck_args(HasAttr(['foo'], {'bar': int}))
+@accepts(HasAttr({'foo': int, 'bar': int}))
 def foo(obj):
 	...
-	
+
+	Insist that `obj` have attributes `foo` and `bar` and that they're both
+	integers
+
+@accepts(HasAttr(['foo'], {'bar': int}))
+def foo(obj):
+	...
+
 	`obj.foo` must be present and `obj.bar` must both be present and be an
 	integer
 
 
-@typecheck_yield(YieldSeq(int, float, int))
+@yields(YieldSeq(int, float, int))
 def foo():
 	yield 5
 	yield 5.0
 	yield 5
-	
+
 	The YieldSeq() utility class can be used to specify that the type of the
 	generator's return value will change from call to call.
 
 
-@typecheck_args(Or(Exact(6), Exact(7)))
+@accepts(Or(Exact(6), Exact(7)))
 def foo(a):
 	...
 
@@ -241,19 +241,19 @@ def foo(a):
 	object can be used with Exact()
 
 
-@typecheck_args(Length(8))
+@accepts(Length(8))
 def foo(a):
 	...
-	
+
 	Here, we don't care what type `a` is, but it has to be a sequence with
 	8 elements.
-	
+
 ### Contributors
 
 Primary contributors:
 	+ Collin Winter <collinw@gmail.com>
 	+ Iain Lowe <ilowe@cryogen.com>
-	
+
 With ideas/patches from:
 	+ Knut Hartmann (doctest tests)
 	+ David A. Wheeler (ideas from his own typecheck package)

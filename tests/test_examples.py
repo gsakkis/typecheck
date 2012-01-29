@@ -6,7 +6,7 @@ def check_type(typ, to_check):
 
 class TypeCheckedTree(TestCase):
     def setUp(self):
-        from typecheck import typecheck_args, register_type
+        from typecheck import accepts, register_type
         from typecheck import _TC_Exception, Type
         from typecheck import _TC_NestedError, _TC_TypeError
 
@@ -73,7 +73,7 @@ class TypeCheckedTree(TestCase):
         register_type(Tree)
         register_type(TreeType)
 
-        @typecheck_args(Tree(int))
+        @accepts(Tree(int))
         def preorder(tree):
             l = [tree.val]
             if tree.left is not None:

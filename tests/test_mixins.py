@@ -3,7 +3,7 @@ from support import TestCase
 class UnorderedIteratorMixinTests(TestCase):
     def setUp(self):
         from typecheck.mixins import UnorderedIteratorMixin
-        from typecheck import typecheck_args
+        from typecheck import accepts
 
         self.UIM = UnorderedIteratorMixin("MyIterator")
         class MyIterator(self.UIM):
@@ -20,7 +20,7 @@ class UnorderedIteratorMixinTests(TestCase):
             def __str__(self):
                 return "MyIterator" + str(tuple(self.__values))
 
-        @typecheck_args(MyIterator(int, float))
+        @accepts(MyIterator(int, float))
         def foo(itr):
             pass
 

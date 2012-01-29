@@ -1,10 +1,10 @@
 from support import TestCase
 import typecheck.doctest_support
-from typecheck import typecheck, TypeCheckException, Any
+from typecheck import accepts, TypeCheckException, Any
 
 class TestSuite(TestCase):
     def testCreateTypeCheckedMethod(self):
-        @typecheck(int)
+        @accepts(int)
         def f(a):
             return 1
 
@@ -17,7 +17,7 @@ class TestSuite(TestCase):
             pass
 
     def testCreateTypeCheckedMethodPositional(self):
-        @typecheck(int, int, str)
+        @accepts(int, int, str)
         def f(a, b, c):
             return 1
 
@@ -32,7 +32,7 @@ class TestSuite(TestCase):
 
     def testCreateTypeCheckedMethodKeyword(self):
         # The original did not supply a type for b
-        @typecheck(a=int, b=Any(), c=str)
+        @accepts(a=int, b=Any(), c=str)
         def f(a=None, b=None, c=None):
             return 1
 
@@ -47,7 +47,7 @@ class TestSuite(TestCase):
                 pass
 
     def testCreateTypeCheckedMethodCombined(self):
-        @typecheck(int, b=int, c=str)
+        @accepts(int, b=int, c=str)
         def f(a, b=None, c=None):
             return 1
 
@@ -62,14 +62,14 @@ class TestSuite(TestCase):
                 pass
 
     def testTypeCheckedMethodRetainsName(self):
-        @typecheck(int)
+        @accepts(int)
         def f(a):
             pass
 
         self.assertEquals('f', f.__name__)
 
     def testTypeCheckedMethodRetainsDocstring(self):
-        @typecheck(int)
+        @accepts(int)
         def f(a):
             'docstring'
             pass
@@ -97,19 +97,19 @@ class TestSuite(TestCase):
         class T:
             pass
 
-        @typecheck(T)
+        @accepts(T)
         def f(t_instance):
             pass
 
     ##########################################################################
 
     #def testTypeCheckMatchesKwToPnIfNoCorrespondingKw(self):
-    #    @typecheck(b=str)
+    #    @accepts(b=str)
     #    def my_func(a, b):
     #        pass
     #
     #def testTypeCheckMatchesKeywordsToPositionalNames(self):
-    #    @typecheck(a=str)
+    #    @accepts(a=str)
     #    def my_func1(a):
     #        pass
     #
@@ -121,7 +121,7 @@ class TestSuite(TestCase):
     #    except:
     #        self.fail('Should have raised a TypeCheckException')
     #
-    #    @typecheck(a=str, b=int)
+    #    @accepts(a=str, b=int)
     #    def my_func2(a, b, c):
     #        pass
     #
