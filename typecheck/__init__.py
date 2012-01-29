@@ -1,4 +1,4 @@
-__all__ = ['accepts', 'returns', 'yields', 'TypeCheckError', 'Empty'
+__all__ = ['accepts', 'returns', 'yields', 'TypeCheckError'
           ,'TypeSignatureError', 'And', 'Any', 'Class', 'Exact', 'HasAttr'
           ,'IsAllOf', 'IsCallable', 'IsIterable', 'IsNoneOf', 'IsOneOf'
           ,'IsOnlyOneOf', 'Not', 'Or', 'Self', 'Xor', 'YieldSeq'
@@ -452,22 +452,6 @@ class AtomicType(TypeAnnotation):
     def __typesig__(cls, obj):
         if isinstance(obj, (types.ClassType, types.TypeType)):
             return AtomicType(obj)
-
-### Provide a way to enforce the empty-ness of iterators
-class Empty(AtomicType):
-    name = "Empty"
-
-    def __init__(self, type):
-        if not hasattr(type, '__len__'):
-            raise TypeError("Can only assert emptyness for types with __len__ methods")
-
-        AtomicType.__init__(self, type)
-
-    def __typecheck__(self, func, to_check):
-        AtomicType.__typecheck__(self, func, to_check)
-
-        if len(to_check) > 0:
-            raise _TC_LengthError(len(to_check), 0)
 
 class Dict(TypeAnnotation):
     name = "Dict"

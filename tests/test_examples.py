@@ -1,6 +1,6 @@
 from support import TestCase
 import typecheck
-from typecheck import TypeAnnotation, _TC_TypeError, _TC_LengthError
+from typecheck import AtomicType, TypeAnnotation, _TC_TypeError, _TC_LengthError
 
 def check_type(typ, to_check):
     typecheck.check_type(typ, None, to_check)
@@ -305,3 +305,149 @@ class Test_Length(TestCase):
 
         and_type = And(Length(3), tuple)
         check_type(and_type, (5, 6, 7))
+
+class Empty(AtomicType):
+    name = "Empty"
+
+    def __init__(self, type):
+        if not hasattr(type, '__len__'):
+            raise TypeError("Can only assert emptyness for types with __len__ methods")
+
+        AtomicType.__init__(self, type)
+
+    def __typecheck__(self, func, to_check):
+        AtomicType.__typecheck__(self, func, to_check)
+
+        if len(to_check) > 0:
+            raise _TC_LengthError(len(to_check), 0)
+
+class Test_Empty(TestCase):
+    def test_bad_constructor_1(self):
+        try:
+            Empty()
+        except TypeError, e:
+            self.assertEqual(str(e), "__init__() takes exactly 2 arguments (1 given)")
+        else:
+            raise AssertionError("Failed to raise TypeError")
+
+    def test_bad_constructor_2(self):
+        try:
+            Empty(dict, list)
+        except TypeError, e:
+            self.assertEqual(str(e), "__init__() takes exactly 2 arguments (3 given)")
+        else:
+            raise AssertionError("Failed to raise TypeError")
+
+    def test_bad_empty_type(self):
+        for t in (int, float):
+            try:
+                Empty(t)
+            except TypeError:
+                pass
+            else:
+                raise AssertionError("Failed to raise TypeError for %s" % t)
+
+    def test_list_success(self):
+        check_type(Empty(list), [])
+
+    def test_list_failure(self):
+        from typecheck import _TC_LengthError
+
+        try:
+            check_type(Empty(list), [5, 6])
+        except _TC_LengthError, e:
+            assert e.wrong == 2
+            assert e.right == 0
+        else:
+            self.fail("Passed incorrectly")
+
+    def test_dict_success(self):
+        check_type(Empty(dict), {})
+
+    def test_dict_failure(self):
+        from typecheck import _TC_LengthError
+
+        try:
+            check_type(Empty(dict), {'f': 5})
+        except _TC_LengthError, e:
+            assert e.wrong == 1
+            assert e.right == 0
+        else:
+            self.fail("Passed incorrectly")
+
+    def test_set_success(self):
+        check_type(Empty(set), set())
+
+    def test_set_failure(self):
+        from typecheck import _TC_LengthError
+
+        try:
+            check_type(Empty(set), set([5, 6]))
+        except _TC_LengthError, e:
+            assert e.wrong == 2
+            assert e.right == 0
+        else:
+            self.fail("Passed incorrectly")
+
+    def test_userdef_success(self):
+        class A(object):
+            def __len__(self):
+                return 0
+
+        check_type(Empty(A), A())
+
+    def test_userdef_failure(self):
+        from typecheck import _TC_LengthError
+
+        class A(object):
+            def __len__(self):
+                return 2
+
+        try:
+            check_type(Empty(A), A())
+        except _TC_LengthError, e:
+            assert e.wrong == 2
+            assert e.right == 0
+        else:
+            self.fail("Passed incorrectly")
+
+    def test_inappropriate_type(self):
+        from typecheck import _TC_TypeError
+
+        for t in (dict, list, set):
+            try:
+                check_type(Empty(t), 5)
+            except _TC_TypeError, e:
+                assert e.right == t
+                assert e.wrong == int
+            else:
+                raise AssertionError("Failed to raise _TC_TypeError")
+
+    def test_equality(self):
+        eq_tests = [
+            (Empty(list), Empty(list)),
+            (Empty(dict), Empty(dict)),
+            (Empty(set), Empty(set)) ]
+
+        ne_tests = [
+            (Empty(list), Empty(dict)),
+            (Empty(list), Empty(set)),
+            (Empty(dict), Empty(list)),
+            (Empty(dict), Empty(set)),
+            (Empty(set), Empty(list)),
+            (Empty(set), Empty(dict)), ]
+
+        self.multipleAssertEqual(eq_tests, ne_tests)
+
+    def test_hash(self):
+        eq_tests = [
+            (Empty(list), Empty(list)),
+            (Empty(dict), Empty(dict)),
+            (Empty(set), Empty(set)) ]
+
+        ne_tests = [
+            (Empty(list), Empty(dict)),
+            (Empty(list), Empty(set)),
+            (Empty(dict), Empty(set)) ]
+
+        self.multipleAssertEqualHashes(eq_tests, ne_tests)
