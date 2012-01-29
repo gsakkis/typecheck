@@ -382,14 +382,13 @@ class Test_Empty(TestCase):
         check_type(Empty(dict), {})
 
     def test_dict_failure(self):
-        from typecheck import Empty, _TC_LengthError, _TC_DictError
+        from typecheck import Empty, _TC_LengthError
 
         try:
             check_type(Empty(dict), {'f': 5})
-        except _TC_DictError, e:
-            assert isinstance(e.inner, _TC_LengthError)
-            assert e.inner.wrong == 1
-            assert e.inner.right == 0
+        except _TC_LengthError, e:
+            assert e.wrong == 1
+            assert e.right == 0
         else:
             self.fail("Passed incorrectly")
 

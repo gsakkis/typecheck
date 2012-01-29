@@ -95,11 +95,9 @@ class _TC_IndexError(_TC_NestedError):
 # message.
 class _TC_DictError(_TC_NestedError):
     def format_bad_object(self, bad_object):
-        message = "for {%s}, " % ', '.join(["%s: %s" % (repr(k), repr(bad_object[k])) for k in sorted(bad_object.keys())])
-
-        if not isinstance(self.inner, _TC_LengthError):
-            return (message, self)
-        return (message, self.inner)
+        message = "for {%s}, " % ', '.join(["%s: %s" % (repr(k), repr(bad_object[k]))
+                                            for k in sorted(bad_object.keys())])
+        return (message, self)
 
     def error_message(self):
         raise NotImplementedError("Incomplete _TC_DictError subclass: " + str(self.__class__))
@@ -155,7 +153,6 @@ class _TC_MissingAttrError(_TC_AttrException):
     def error_message(self):
         return "missing attribute %s" % self.attr
 
-# This is like _TC_LengthError for YieldSeq
 class _TC_YieldCountError(_TC_Exception):
     def __init__(self, expected):
         _TC_Exception.__init__(self, expected)
@@ -470,10 +467,7 @@ class Empty(AtomicType):
         AtomicType.__typecheck__(self, func, to_check)
 
         if len(to_check) > 0:
-            err = _TC_LengthError(len(to_check), 0)
-            if isinstance(to_check, dict):
-                raise _TC_DictError(err)
-            raise err
+            raise _TC_LengthError(len(to_check), 0)
 
 class Dict(TypeAnnotation):
     name = "Dict"
