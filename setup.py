@@ -1,10 +1,4 @@
-try:
-    import ez_setup
-    ez_setup.use_setuptools()
-
-    from setuptools import setup
-except ImportError:
-    from distuils.core import setup
+from distutils.core import setup
 
 setup(
     name = 'typecheck',
