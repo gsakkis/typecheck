@@ -161,6 +161,18 @@ class DictTests(TestCase):
 
         self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
+    def test_empty_dict_failure(self):
+        from typecheck import accepts
+
+        try:
+            @accepts({})
+            def f(x):
+                pass
+        except TypeError:
+            pass
+        else:
+            self.fail("Passed incorrectly")
+
 class TupleTests(TestCase):
     def setUp(self):
         from typecheck import Tuple
@@ -217,14 +229,12 @@ class TupleTests(TestCase):
         eq_tests = [
             (Tuple(str, int), Tuple(str, int)),
             (Tuple(str, A), Tuple(str, A)),
-            (Tuple(), Tuple()),
             (Tuple(str, Tuple(str, int)), Tuple(str, Tuple(str, int))) ]
 
         ne_tests = [
             (Tuple(str, int), Tuple(int, str)),
             (Tuple(str, int), (str, int)),
             (Tuple(A, A), Tuple(A, B)),
-            (Tuple(str, int, float), Tuple()),
             (Tuple(str, Tuple(str, int)), Tuple(str, Tuple(int, str))) ]
 
         self.multipleAssertEqual(eq_tests, ne_tests)
@@ -238,30 +248,24 @@ class TupleTests(TestCase):
         eq_tests = [
             (Tuple(str, int), Tuple(str, int)),
             (Tuple(str, A), Tuple(str, A)),
-            (Tuple(), Tuple()),
             (Tuple(str, Tuple(str, int)), Tuple(str, Tuple(str, int))) ]
 
         ne_tests = [
             (Tuple(str, int), Tuple(int, str)),
             (Tuple(A, A), Tuple(A, B)),
-            (Tuple(str, int, float), Tuple()),
             (Tuple(str, Tuple(str, int)), Tuple(str, Tuple(int, str))) ]
 
         self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
-    def test_empty_tuple_success(self):
-        from typecheck import Tuple
-
-        check_type(Tuple(), tuple())
-
     def test_empty_tuple_failure(self):
-        from typecheck import Tuple, _TC_TypeError
+        from typecheck import accepts
 
         try:
-            check_type(Tuple(), (5, 6))
-        except _TC_TypeError, e:
-            assert e.wrong == (int, int)
-            assert e.right == ()
+            @accepts(())
+            def f(x):
+                pass
+        except TypeError:
+            pass
         else:
             self.fail("Passed incorrectly")
 
@@ -311,13 +315,11 @@ class AtomicType_ListTests(TestCase):
         eq_tests = [
             (List(str), List(str)),
             (List(A), List(A)),
-            (List(), List()),
             (List(List(int)), List(List(int))) ]
 
         ne_tests = [
             (List(str), List(int)),
             (List(A), List(B)),
-            (List(), List(int)),
             (List(List(int)), List(List(List(int)))),
             (List(int), List(int, int)),
             (List(int), [int]) ]
@@ -333,17 +335,27 @@ class AtomicType_ListTests(TestCase):
         eq_tests = [
             (List(str), List(str)),
             (List(A), List(A)),
-            (List(), List()),
             (List(List(int)), List(List(int))) ]
 
         ne_tests = [
             (List(str), List(int)),
             (List(A), List(B)),
-            (List(), List(int)),
             (List(List(int)), List(List(List(int)))),
             (List(int), List(int, int)) ]
 
         self.multipleAssertEqualHashes(eq_tests, ne_tests)
+
+    def test_empty_list_failure(self):
+        from typecheck import accepts
+
+        try:
+            @accepts([])
+            def f(x):
+                pass
+        except TypeError:
+            pass
+        else:
+            self.fail("Passed incorrectly")
 
 class Pattern_ListTests(TestCase):
     def setUp(self):
@@ -410,7 +422,6 @@ class Pattern_ListTests(TestCase):
             (List(str, int), List(int, str)),
             (List(A, B), List(B, B)),
             (List(A, B), List(A, A)),
-            (List(), List(int, int)),
             (List(List(int, int)), List(List(List(int, int)))),
             (List(int, int), List(int, int, int)),
             (List(int, int), [int, int]) ]
@@ -432,7 +443,6 @@ class Pattern_ListTests(TestCase):
             (List(str, int), List(int, str)),
             (List(A, B), List(B, B)),
             (List(A, B), List(A, A)),
-            (List(), List(int, int)),
             (List(List(int, int)), List(List(List(int, int)))),
             (List(int, int), List(int, int, int)) ]
 

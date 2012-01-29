@@ -514,8 +514,8 @@ class Dict(TypeAnnotation):
     @classmethod
     def __typesig__(cls, obj):
         if isinstance(obj, dict):
-            if len(obj) == 0:
-                return Empty(dict)
+            if not obj:
+                raise TypeError("Empty dict is not a valid signature")
             return Dict(obj.keys()[0], obj.values()[0])
 
 ### Provide typechecking for the built-in list() type
@@ -523,6 +523,8 @@ class List(TypeAnnotation):
     name = "List"
 
     def __init__(self, *type):
+        if not type:
+            raise TypeError("Must supply at least one type to __init__()")
         self._types = [Type(t) for t in type]
         self.type = [t.type for t in self._types]
 
@@ -573,8 +575,6 @@ class List(TypeAnnotation):
     @classmethod
     def __typesig__(cls, obj):
         if isinstance(obj, list):
-            if len(obj) == 0:
-                return Empty(list)
             return List(*obj)
 
 ### Provide typechecking for the built-in tuple() class
