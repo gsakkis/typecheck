@@ -1033,9 +1033,6 @@ class Test_accepts(TestCase):
 
 
 class SetTests(TestCase):
-    def test_empty_list(self):
-        Set([])
-
     def test_success_basic(self):
         check_type(Set([int]), set([4, 5, 6, 4, 5, 6]))
 
@@ -1048,20 +1045,6 @@ class SetTests(TestCase):
         check_type(Set([(int, int)]), set([(4, 5), (6, 7)]))
 
         check_type(Set([Or(int, float)]), set([4, 4.0, 5, 5.0]))
-
-    def test_success_empty(self):
-        check_type(Set([]), set())
-
-    def test_failure_empty(self):
-        from typecheck import _TC_LengthError
-
-        try:
-            check_type(Set([]), set([4, 5, 6]))
-        except _TC_LengthError, e:
-            assert e.right == 0
-            assert e.wrong == 3
-        else:
-            raise AssertionError("Failed to raise _TC_LengthError")
 
     def test_failure(self):
         from typecheck import _TC_KeyError, _TC_TypeError
@@ -1109,7 +1092,6 @@ class SetTests(TestCase):
         eq_tests = [
             (Set([str]), Set([str])),
             (Set([A, B]), Set([A, B])),
-            (Set([]), Set([])),
             (Set([int, int, str]), Set([int, str])),
             (Set([int, str]), Set([str, int])),
             (Set([Set([int, float]), int]), Set([Set([float, int]), int])),
@@ -1118,7 +1100,6 @@ class SetTests(TestCase):
         ne_tests = [
             (Set([A, B]), Set([B, B])),
             (Set([A, B]), Set([A, A])),
-            (Set([]), Set([int, int])),
             (Set([Set([int, str])]), Set([Set([Set([int, str])])])),
             (Set([int, int]), set([int, int])) ]
 
@@ -1131,7 +1112,6 @@ class SetTests(TestCase):
         eq_tests = [
             (Set([str]), Set([str])),
             (Set([A, B]), Set([A, B])),
-            (Set([]), Set([])),
             (Set([int, int, str]), Set([int, str])),
             (Set([int, str]), Set([str, int])),
             (Set([Set([int, float]), int]), Set([Set([float, int]), int])),
@@ -1140,7 +1120,6 @@ class SetTests(TestCase):
         ne_tests = [
             (Set([A, B]), Set([B, B])),
             (Set([A, B]), Set([A, A])),
-            (Set([]), Set([int, int])),
             (Set([Set([int, str])]), Set([Set([Set([int, str])])])) ]
 
         self.multipleAssertEqualHashes(eq_tests, ne_tests)
