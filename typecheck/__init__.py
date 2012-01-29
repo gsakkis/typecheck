@@ -6,9 +6,25 @@ __all__ = ['accepts', 'returns', 'yields', 'TypeCheckError', 'Length', 'Empty'
           ,'Function']
 
 import inspect
+import sys
 import types
 
 from types import GeneratorType, FunctionType, MethodType, ClassType, TypeType
+
+# Monkey patch DocTestFinder._from_module for Python 2.5 or earlier so that
+# doctest can find typechecked functions.
+if sys.version_info[:2] < (2, 6):
+    from doctest import DocTestFinder
+    old_from_module = DocTestFinder._from_module
+
+    def _from_module(self, module, object):
+        """Return true if the given object is defined in the given module."""
+        if module is not None and inspect.getmodule(object) is not None:
+            return module is inspect.getmodule(object)
+        return old_from_module(self, module, object)
+
+    DocTestFinder._from_module = _from_module
+    del DocTestFinder, old_from_module, _from_module
 
 # Controls whether typechecking is on (True) or off (False)
 enable_checking = True
@@ -1077,7 +1093,6 @@ class Length(CheckType):
         if length != self._length:
             raise _TC_LengthError(length, self._length)
 
-import sys
 class Class(CheckType):
     def __init__(self, class_name):
         self.type = self
