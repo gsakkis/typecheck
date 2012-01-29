@@ -1006,6 +1006,32 @@ class Test_accepts(TestCase):
 
         assert isinstance(foo, types.FunctionType)
 
+    def test_method_retains_name_docstring(self):
+        from typecheck import accepts
+
+        @accepts(int)
+        def f(a):
+            'f docstring'
+
+        self.assertEquals(f.__name__, 'f')
+        self.assertEquals(f.__doc__, 'f docstring')
+
+    def test_oldstyle_classes_accepted(self):
+        from typecheck import accepts, TypeCheckError
+
+        class T: pass
+        class T2(T): pass
+
+        @accepts(T)
+        def f(t_instance):
+            pass
+
+        f(T())
+        f(T2())
+        self.assertRaises(TypeCheckError, f, T)
+        self.assertRaises(TypeCheckError, f, T2)
+
+
 class SetTests(TestCase):
     def test_empty_list(self):
         Set([])

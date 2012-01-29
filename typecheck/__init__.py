@@ -1225,13 +1225,9 @@ IsOnlyOneOf = Xor
 ### This is the public side of the module
 #########################################
 
-# This is for backwards compatibility with v0.1.6 and earlier
-class TypeCheckException(Exception):
-    pass
-
-class TypeCheckError(TypeCheckException):
+class TypeCheckError(Exception):
     def __init__(self, prefix, bad_object, exception):
-        TypeCheckException.__init__(self, prefix, bad_object, exception)
+        Exception.__init__(self, prefix, bad_object, exception)
 
         self.prefix = prefix
         self.internal = exception
