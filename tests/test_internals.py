@@ -676,7 +676,7 @@ class ExtensibleSigTests(TestCase):
             def __typesig__(cls, obj):
                 # Note that you can either include this test
                 # or your classes (like ExactValue) can inherit
-                # from CheckType; either works, but you have
+                # from TypeAnnotation; either works, but you have
                 # to do one or the other.
                 if isinstance(obj, cls):
                     return obj

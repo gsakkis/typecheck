@@ -400,7 +400,7 @@ def calculate_type(obj):
 ### The following classes are the work-horses of the typechecker
 
 # The base class for all the other utility classes
-class CheckType(object):
+class TypeAnnotation(object):
     def __repr__(self):
         return type(self).name + '(' + ', '.join(sorted(repr(t) for t in self._types)) + ')'
 
@@ -413,17 +413,17 @@ class CheckType(object):
         return not self == other
 
     def __hash__(self):
-        raise NotImplementedError("Incomplete CheckType subclass: %s" % self.__class__)
+        raise NotImplementedError("Incomplete TypeAnnotation subclass: %s" % self.__class__)
 
     def __typecheck__(self, func, obj):
-        raise NotImplementedError("Incomplete CheckType subclass: %s" % self.__class__)
+        raise NotImplementedError("Incomplete TypeAnnotation subclass: %s" % self.__class__)
 
     @classmethod
     def __typesig__(cls, obj):
-        if isinstance(obj, CheckType):
+        if isinstance(obj, TypeAnnotation):
             return obj
 
-class AtomicType(CheckType):
+class AtomicType(TypeAnnotation):
     name = "AtomicType"
 
     def __init__(self, type):
@@ -475,7 +475,7 @@ class Empty(AtomicType):
                 raise _TC_DictError(err)
             raise err
 
-class Dict(CheckType):
+class Dict(TypeAnnotation):
     name = "Dict"
 
     def __init__(self, key, val):
@@ -525,7 +525,7 @@ class Dict(CheckType):
             return Dict(obj.keys()[0], obj.values()[0])
 
 ### Provide typechecking for the built-in list() type
-class List(CheckType):
+class List(TypeAnnotation):
     name = "List"
 
     def __init__(self, *type):
@@ -613,7 +613,7 @@ class Tuple(List):
 ###
 ### XXX: Investigate rewriting this in terms of
 ### UnorderedIteratorMixin or Or()
-class Set(CheckType):
+class Set(TypeAnnotation):
     def __init__(self, set_list):
         self.type = set(set_list)
         self._types = [Type(t) for t in self.type]
@@ -666,7 +666,7 @@ class Set(CheckType):
         if isinstance(obj, set):
             return Set(obj)
 
-class TypeVariables(CheckType):
+class TypeVariables(TypeAnnotation):
     # This is a stack of {typevariable -> type} mappings
     # It is intentional that it is class-wide; it maintains
     # the mappings of the outer functions if we descend into
@@ -754,7 +754,7 @@ class TypeVariables(CheckType):
         else:
             raise TypeError(func)
 
-class CheckerFunction(CheckType):
+class CheckerFunction(TypeAnnotation):
     def __init__(self, func):
         self._func = func
         self.type = self
@@ -787,7 +787,7 @@ class CheckerFunction(CheckType):
         return hash(str(self.__class__) + str(hash(self._func)))
 
 # Register some of the above types so that Type() knows about them
-for c in (CheckType, List, Tuple, Dict, Set, AtomicType, TypeVariables, CheckerFunction):
+for c in (TypeAnnotation, List, Tuple, Dict, Set, AtomicType, TypeVariables, CheckerFunction):
     register_type(c)
 
 ### The following are utility classes intended to make writing complex
@@ -796,7 +796,7 @@ for c in (CheckType, List, Tuple, Dict, Set, AtomicType, TypeVariables, CheckerF
 
 ### Instances of Any() automatically approve of the object they're supposed
 ### to be checking (ie, they don't actually check it; use this with caution)
-class Any(CheckType):
+class Any(TypeAnnotation):
     name = "Any"
 
     def __init__(self):
@@ -818,7 +818,7 @@ class Any(CheckType):
         return hash(self.__class__)
 
 ### Base class for Or() and And()
-class _Boolean(CheckType):
+class _Boolean(TypeAnnotation):
     def __init__(self, first_type, second_type, *types):
         self._types = set()
 
@@ -902,7 +902,7 @@ class Xor(_Boolean):
         if not already_met_1_cond:
             raise _TC_XorError(0, _TC_TypeError(to_check, self))
 
-class IsCallable(CheckType):
+class IsCallable(TypeAnnotation):
     def __init__(self):
         self.type = self
 
@@ -923,7 +923,7 @@ class IsCallable(CheckType):
         if not callable(to_check):
             raise _TC_TypeError(to_check, 'a callable')
 
-class HasAttr(CheckType):
+class HasAttr(TypeAnnotation):
     def __init__(self, set_1, set_2=None):
         attr_sets = {list: [], dict: {}}
 
@@ -975,7 +975,7 @@ class HasAttr(CheckType):
 
     __repr__ = __str__
 
-class IsIterable(CheckType):
+class IsIterable(TypeAnnotation):
     def __init__(self):
         self.type = self
 
@@ -996,7 +996,7 @@ class IsIterable(CheckType):
         if not (hasattr(to_check, '__iter__') and callable(to_check.__iter__)):
             raise _TC_TypeError(to_check, "an iterable")
 
-class YieldSeq(CheckType):
+class YieldSeq(TypeAnnotation):
     _index_map = {}
 
     def __init__(self, type_1, type_2, *types):
@@ -1049,7 +1049,7 @@ class YieldSeq(CheckType):
 
 register_type(YieldSeq)
 
-class Exact(CheckType):
+class Exact(TypeAnnotation):
     def __init__(self, obj):
         self.type = self
         self._obj = obj
@@ -1071,7 +1071,7 @@ class Exact(CheckType):
         if self._obj != to_check:
             raise _TC_ExactError(to_check, self._obj)
 
-class Length(CheckType):
+class Length(TypeAnnotation):
     def __init__(self, length):
         self.type = self
         self._length = int(length)
@@ -1093,7 +1093,7 @@ class Length(CheckType):
         if length != self._length:
             raise _TC_LengthError(length, self._length)
 
-class Class(CheckType):
+class Class(TypeAnnotation):
     def __init__(self, class_name):
         self.type = self
         self.class_name = class_name
@@ -1130,7 +1130,7 @@ class Class(CheckType):
         if not isinstance(to_check, self.class_obj):
             raise _TC_TypeError(to_check, self.class_obj)
 
-class Typeclass(CheckType):
+class Typeclass(TypeAnnotation):
     bad_members = dict.fromkeys(['__class__', '__new__', '__init__'], True)
 
     def __init__(self, *types):

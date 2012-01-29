@@ -1115,12 +1115,12 @@ class Test_Exact(TestCase):
             raise AssertionError("Failed to raise _TC_ExactError")
 
     def test_fail_3(self):
-        from typecheck import Exact, CheckType, _TC_ExactError
+        from typecheck import Exact, TypeAnnotation, _TC_ExactError
 
         try:
-            check_type(Exact(CheckType), Exact)
+            check_type(Exact(TypeAnnotation), Exact)
         except _TC_ExactError, e:
-            assert e.right == CheckType
+            assert e.right == TypeAnnotation
             assert e.wrong == Exact
         else:
             raise AssertionError("Failed to raise _TC_ExactError")
