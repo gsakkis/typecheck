@@ -241,13 +241,6 @@ def foo(a):
 	object can be used with Exact()
 
 
-@accepts(Length(8))
-def foo(a):
-	...
-
-	Here, we don't care what type `a` is, but it has to be a sequence with
-	8 elements.
-
 ### Contributors
 
 Primary contributors:

@@ -1,4 +1,4 @@
-__all__ = ['accepts', 'returns', 'yields', 'TypeCheckError', 'Length', 'Empty'
+__all__ = ['accepts', 'returns', 'yields', 'TypeCheckError', 'Empty'
           ,'TypeSignatureError', 'And', 'Any', 'Class', 'Exact', 'HasAttr'
           ,'IsAllOf', 'IsCallable', 'IsIterable', 'IsNoneOf', 'IsOneOf'
           ,'IsOnlyOneOf', 'Not', 'Or', 'Self', 'Xor', 'YieldSeq'
@@ -1070,28 +1070,6 @@ class Exact(TypeAnnotation):
     def __typecheck__(self, func, to_check):
         if self._obj != to_check:
             raise _TC_ExactError(to_check, self._obj)
-
-class Length(TypeAnnotation):
-    def __init__(self, length):
-        self.type = self
-        self._length = int(length)
-
-    def __hash__(self):
-        return hash(str(self.__class__) + str(self._length))
-
-    def __eq__(self, other):
-        if self.__class__ is not other.__class__:
-            return False
-        return self._length == other._length
-
-    def __typecheck__(self, func, to_check):
-        try:
-            length = len(to_check)
-        except TypeError:
-            raise _TC_TypeError(to_check, "something with a __len__ method")
-
-        if length != self._length:
-            raise _TC_LengthError(length, self._length)
 
 class Class(TypeAnnotation):
     def __init__(self, class_name):

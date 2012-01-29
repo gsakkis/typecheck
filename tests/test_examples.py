@@ -1,5 +1,6 @@
 from support import TestCase
 import typecheck
+from typecheck import TypeAnnotation, _TC_TypeError, _TC_LengthError
 
 def check_type(typ, to_check):
     typecheck.check_type(typ, None, to_check)
@@ -207,3 +208,100 @@ class IsIterableCase(TestCase):
             pass
         else:
             raise AssertionError("Failed to raise _TC_MissingAttrError")
+
+class Length(TypeAnnotation):
+    def __init__(self, length):
+        self.type = self
+        self._length = int(length)
+
+    def __hash__(self):
+        return hash(str(self.__class__) + str(self._length))
+
+    def __eq__(self, other):
+        if self.__class__ is not other.__class__:
+            return False
+        return self._length == other._length
+
+    def __typecheck__(self, func, to_check):
+        try:
+            length = len(to_check)
+        except TypeError:
+            raise _TC_TypeError(to_check, "something with a __len__ method")
+
+        if length != self._length:
+            raise _TC_LengthError(length, self._length)
+
+class Test_Length(TestCase):
+    def test_constructor(self):
+        try:
+            Length()
+        except TypeError, e:
+            assert str(e) == "__init__() takes exactly 2 arguments (1 given)"
+        else:
+            raise AssertionError("Failed to raise TypeError")
+
+        try:
+            Length(4, 5)
+        except TypeError, e:
+            assert str(e) == "__init__() takes exactly 2 arguments (3 given)"
+        else:
+            raise AssertionError("Failed to raise TypeError")
+
+    def test_bad_argument(self):
+        try:
+            Length('abc')
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("Failed to raise an exception")
+
+    def test_equality(self):
+        eq_tests = [(Length(4), Length(4)), (Length(4.0), Length(4))]
+        ne_tests = [(Length(5), Length(4))]
+
+        self.multipleAssertEqual(eq_tests, ne_tests)
+
+    def test_hash(self):
+        eq_tests = [(Length(4), Length(4)), (Length(4.0), Length(4))]
+        ne_tests = [(Length(5), Length(4))]
+
+        self.multipleAssertEqualHashes(eq_tests, ne_tests)
+
+    def test_pass_builtins(self):
+        for obj in ([4, 5], (6, 7), {5: 6, 7: 8}):
+            check_type(Length(2), obj)
+
+    def test_pass_userdef(self):
+        class A(object):
+            def __len__(self):
+                return 5
+
+        check_type(Length(5), A())
+
+    def test_fail_1(self):
+        from typecheck import _TC_LengthError
+
+        try:
+            check_type(Length(5), [6])
+        except _TC_LengthError, e:
+            assert e.wrong == 1
+            assert e.right == 5
+        else:
+            raise AssertionError("Failed to raise _TC_LengthError")
+
+    def test_fail_2(self):
+        from typecheck import _TC_TypeError
+
+        try:
+            check_type(Length(5), 5)
+        except _TC_TypeError, e:
+            assert e.right == "something with a __len__ method"
+            assert e.wrong == int
+        else:
+            raise AssertionError("Failed to raise _TC_TypeError")
+
+    def test_combined(self):
+        from typecheck import And
+
+        and_type = And(Length(3), tuple)
+        check_type(and_type, (5, 6, 7))
