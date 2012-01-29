@@ -423,8 +423,8 @@ class CheckType(object):
         if isinstance(obj, CheckType):
             return obj
 
-class Single(CheckType):
-    name = "Single"
+class AtomicType(CheckType):
+    name = "AtomicType"
 
     def __init__(self, type):
         if not isinstance(type, (types.ClassType, types.TypeType)):
@@ -454,20 +454,20 @@ class Single(CheckType):
     @classmethod
     def __typesig__(cls, obj):
         if isinstance(obj, (types.ClassType, types.TypeType)):
-            return Single(obj)
+            return AtomicType(obj)
 
 ### Provide a way to enforce the empty-ness of iterators
-class Empty(Single):
+class Empty(AtomicType):
     name = "Empty"
 
     def __init__(self, type):
         if not hasattr(type, '__len__'):
             raise TypeError("Can only assert emptyness for types with __len__ methods")
 
-        Single.__init__(self, type)
+        AtomicType.__init__(self, type)
 
     def __typecheck__(self, func, to_check):
-        Single.__typecheck__(self, func, to_check)
+        AtomicType.__typecheck__(self, func, to_check)
 
         if len(to_check) > 0:
             err = _TC_LengthError(len(to_check), 0)
@@ -787,7 +787,7 @@ class CheckerFunction(CheckType):
         return hash(str(self.__class__) + str(hash(self._func)))
 
 # Register some of the above types so that Type() knows about them
-for c in (CheckType, List, Tuple, Dict, Set, Single, TypeVariables, CheckerFunction):
+for c in (CheckType, List, Tuple, Dict, Set, AtomicType, TypeVariables, CheckerFunction):
     register_type(c)
 
 ### The following are utility classes intended to make writing complex

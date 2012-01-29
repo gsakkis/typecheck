@@ -4,38 +4,38 @@ import typecheck
 def check_type(typ, obj):
     typecheck.check_type(typ, None, obj)
 
-class SingleTests(TestCase):
+class AtomicTypeTests(TestCase):
     def test_success_builtin_types(self):
-        from typecheck import Single
+        from typecheck import AtomicType
 
-        check_type(Single(int), 7)
-        check_type(Single(float), 7.0)
+        check_type(AtomicType(int), 7)
+        check_type(AtomicType(float), 7.0)
 
     def test_success_userdef_classes_oldstyle(self):
-        from typecheck import Single
+        from typecheck import AtomicType
 
         class A: pass
         class B(A): pass
 
-        check_type(Single(A), A())
-        check_type(Single(A), B())
-        check_type(Single(B) , B())
+        check_type(AtomicType(A), A())
+        check_type(AtomicType(A), B())
+        check_type(AtomicType(B) , B())
 
     def test_success_userdef_classes_newstyle(self):
-        from typecheck import Single
+        from typecheck import AtomicType
 
         class A(object): pass
         class B(A): pass
 
-        check_type(Single(A), A())
-        check_type(Single(A), B())
-        check_type(Single(B), B())
+        check_type(AtomicType(A), A())
+        check_type(AtomicType(A), B())
+        check_type(AtomicType(B), B())
 
     def test_failure(self):
-        from typecheck import Single, _TC_TypeError
+        from typecheck import AtomicType, _TC_TypeError
 
         try:
-            check_type(Single(int), 7.0)
+            check_type(AtomicType(int), 7.0)
         except _TC_TypeError, e:
             assert e.right == int
             assert e.wrong == float
@@ -43,36 +43,36 @@ class SingleTests(TestCase):
             raise AssertionError("Failed to raise the proper exception")
 
     def test_equality(self):
-        from typecheck import Single
+        from typecheck import AtomicType
 
         class A(object): pass
         class B(A): pass
 
         eq_tests = [
-            (Single(int), Single(int)),
-            (Single(A), Single(A)),
-            (Single(B), Single(B)) ]
+            (AtomicType(int), AtomicType(int)),
+            (AtomicType(A), AtomicType(A)),
+            (AtomicType(B), AtomicType(B)) ]
 
         ne_tests = [
-            (Single(int), Single(float)),
-            (Single(A), Single(B)) ]
+            (AtomicType(int), AtomicType(float)),
+            (AtomicType(A), AtomicType(B)) ]
 
         self.multipleAssertEqual(eq_tests, ne_tests)
 
     def test_hash(self):
-        from typecheck import Single
+        from typecheck import AtomicType
 
         class A(object): pass
         class B(A): pass
 
         eq_tests = [
-            (Single(int), Single(int)),
-            (Single(A), Single(A)),
-            (Single(B), Single(B)) ]
+            (AtomicType(int), AtomicType(int)),
+            (AtomicType(A), AtomicType(A)),
+            (AtomicType(B), AtomicType(B)) ]
 
         ne_tests = [
-            (Single(int), Single(float)),
-            (Single(A), Single(B)) ]
+            (AtomicType(int), AtomicType(float)),
+            (AtomicType(A), AtomicType(B)) ]
 
         self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
@@ -265,7 +265,7 @@ class TupleTests(TestCase):
         else:
             self.fail("Passed incorrectly")
 
-class SingleType_ListTests(TestCase):
+class AtomicType_ListTests(TestCase):
     def setUp(self):
         from typecheck import List
 
