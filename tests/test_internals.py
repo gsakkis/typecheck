@@ -42,40 +42,6 @@ class AtomicTypeTests(TestCase):
         else:
             raise AssertionError("Failed to raise the proper exception")
 
-    def test_equality(self):
-        from typecheck import AtomicType
-
-        class A(object): pass
-        class B(A): pass
-
-        eq_tests = [
-            (AtomicType(int), AtomicType(int)),
-            (AtomicType(A), AtomicType(A)),
-            (AtomicType(B), AtomicType(B)) ]
-
-        ne_tests = [
-            (AtomicType(int), AtomicType(float)),
-            (AtomicType(A), AtomicType(B)) ]
-
-        self.multipleAssertEqual(eq_tests, ne_tests)
-
-    def test_hash(self):
-        from typecheck import AtomicType
-
-        class A(object): pass
-        class B(A): pass
-
-        eq_tests = [
-            (AtomicType(int), AtomicType(int)),
-            (AtomicType(A), AtomicType(A)),
-            (AtomicType(B), AtomicType(B)) ]
-
-        ne_tests = [
-            (AtomicType(int), AtomicType(float)),
-            (AtomicType(A), AtomicType(B)) ]
-
-        self.multipleAssertEqualHashes(eq_tests, ne_tests)
-
 class DictTests(TestCase):
     def setUp(self):
         from typecheck import Dict
@@ -127,39 +93,6 @@ class DictTests(TestCase):
             assert e.right == { str: int }
         else:
             self.fail("Passed incorrectly")
-
-    def test_equality(self):
-        from typecheck import Dict
-
-        class A(object): pass
-
-        eq_tests = [
-            (Dict(str, int), Dict(str, int)),
-            (Dict(str, A), Dict(str, A)),
-            (Dict(str, Dict(str, int)), Dict(str, Dict(str, int))) ]
-
-        ne_tests = [
-            (Dict(str, int), Dict(int, str)),
-            (Dict(str, int), {'a': 5}),
-            (Dict(str, Dict(str, int)), Dict(str, Dict(int, str))) ]
-
-        self.multipleAssertEqual(eq_tests, ne_tests)
-
-    def test_hash(self):
-        from typecheck import Dict
-
-        class A(object): pass
-
-        eq_tests = [
-            (Dict(str, int), Dict(str, int)),
-            (Dict(str, A), Dict(str, A)),
-            (Dict(str, Dict(str, int)), Dict(str, Dict(str, int))) ]
-
-        ne_tests = [
-            (Dict(str, int), Dict(int, str)),
-            (Dict(str, Dict(str, int)), Dict(str, Dict(int, str))) ]
-
-        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
     def test_empty_dict_failure(self):
         from typecheck import accepts
@@ -220,43 +153,6 @@ class TupleTests(TestCase):
         else:
             self.fail("Passed incorrectly")
 
-    def test_equality(self):
-        from typecheck import Tuple
-
-        class A(object): pass
-        class B(A): pass
-
-        eq_tests = [
-            (Tuple(str, int), Tuple(str, int)),
-            (Tuple(str, A), Tuple(str, A)),
-            (Tuple(str, Tuple(str, int)), Tuple(str, Tuple(str, int))) ]
-
-        ne_tests = [
-            (Tuple(str, int), Tuple(int, str)),
-            (Tuple(str, int), (str, int)),
-            (Tuple(A, A), Tuple(A, B)),
-            (Tuple(str, Tuple(str, int)), Tuple(str, Tuple(int, str))) ]
-
-        self.multipleAssertEqual(eq_tests, ne_tests)
-
-    def test_hash(self):
-        from typecheck import Tuple
-
-        class A(object): pass
-        class B(A): pass
-
-        eq_tests = [
-            (Tuple(str, int), Tuple(str, int)),
-            (Tuple(str, A), Tuple(str, A)),
-            (Tuple(str, Tuple(str, int)), Tuple(str, Tuple(str, int))) ]
-
-        ne_tests = [
-            (Tuple(str, int), Tuple(int, str)),
-            (Tuple(A, A), Tuple(A, B)),
-            (Tuple(str, Tuple(str, int)), Tuple(str, Tuple(int, str))) ]
-
-        self.multipleAssertEqualHashes(eq_tests, ne_tests)
-
     def test_empty_tuple_failure(self):
         from typecheck import accepts
 
@@ -305,45 +201,6 @@ class AtomicType_ListTests(TestCase):
             assert e.wrong == {str: int}
         else:
             self.fail("Passed incorrectly")
-
-    def test_equality(self):
-        from typecheck import List
-
-        class A(object): pass
-        class B(A): pass
-
-        eq_tests = [
-            (List(str), List(str)),
-            (List(A), List(A)),
-            (List(List(int)), List(List(int))) ]
-
-        ne_tests = [
-            (List(str), List(int)),
-            (List(A), List(B)),
-            (List(List(int)), List(List(List(int)))),
-            (List(int), List(int, int)),
-            (List(int), [int]) ]
-
-        self.multipleAssertEqual(eq_tests, ne_tests)
-
-    def test_hash(self):
-        from typecheck import List
-
-        class A(object): pass
-        class B(A): pass
-
-        eq_tests = [
-            (List(str), List(str)),
-            (List(A), List(A)),
-            (List(List(int)), List(List(int))) ]
-
-        ne_tests = [
-            (List(str), List(int)),
-            (List(A), List(B)),
-            (List(List(int)), List(List(List(int)))),
-            (List(int), List(int, int)) ]
-
-        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
     def test_empty_list_failure(self):
         from typecheck import accepts
@@ -406,47 +263,6 @@ class Pattern_ListTests(TestCase):
             assert e.wrong == 5
         else:
             self.fail("Passed incorrectly")
-
-    def test_equality(self):
-        from typecheck import List
-
-        class A(object): pass
-        class B(A): pass
-
-        eq_tests = [
-            (List(str, str), List(str, str)),
-            (List(A, B), List(A, B)),
-            (List(List(int, int), int), List(List(int, int), int)) ]
-
-        ne_tests = [
-            (List(str, int), List(int, str)),
-            (List(A, B), List(B, B)),
-            (List(A, B), List(A, A)),
-            (List(List(int, int)), List(List(List(int, int)))),
-            (List(int, int), List(int, int, int)),
-            (List(int, int), [int, int]) ]
-
-        self.multipleAssertEqual(eq_tests, ne_tests)
-
-    def test_hash(self):
-        from typecheck import List
-
-        class A(object): pass
-        class B(A): pass
-
-        eq_tests = [
-            (List(str, str), List(str, str)),
-            (List(A, B), List(A, B)),
-            (List(List(int, int), int), List(List(int, int), int)) ]
-
-        ne_tests = [
-            (List(str, int), List(int, str)),
-            (List(A, B), List(B, B)),
-            (List(A, B), List(A, A)),
-            (List(List(int, int)), List(List(List(int, int)))),
-            (List(int, int), List(int, int, int)) ]
-
-        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
 class NestedTests(TestCase):
     def test_patterned_lists_in_lists(self):
@@ -960,20 +776,6 @@ class Test_TypeVariables(TestCase):
         TypeVariables._TypeVariables__gen_mappings = {}
         TypeVariables._TypeVariables__mapping_stack = []
         TypeVariables._TypeVariables__active_mapping = None
-
-    def test_equality(self):
-        from typecheck import TypeVariables
-
-        assert TypeVariables('a') != TypeVariables('b')
-        assert TypeVariables('a') == TypeVariables('a')
-        assert TypeVariables('a') != TypeVariables(u'a')
-
-    def test_hash(self):
-        from typecheck import TypeVariables
-
-        assert hash(TypeVariables('a')) != hash(TypeVariables('b'))
-        assert hash(TypeVariables('a')) == hash(TypeVariables('a'))
-        assert hash(TypeVariables('a')) != hash(TypeVariables(u'a'))
 
     def test_args_and_return_pass(self):
         from typecheck import accepts, returns

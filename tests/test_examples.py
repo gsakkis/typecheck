@@ -233,18 +233,6 @@ class Test_Length(TestCase):
         else:
             raise AssertionError("Failed to raise an exception")
 
-    def test_equality(self):
-        eq_tests = [(Length(4), Length(4)), (Length(4.0), Length(4))]
-        ne_tests = [(Length(5), Length(4))]
-
-        self.multipleAssertEqual(eq_tests, ne_tests)
-
-    def test_hash(self):
-        eq_tests = [(Length(4), Length(4)), (Length(4.0), Length(4))]
-        ne_tests = [(Length(5), Length(4))]
-
-        self.multipleAssertEqualHashes(eq_tests, ne_tests)
-
     def test_pass_builtins(self):
         for obj in ([4, 5], (6, 7), {5: 6, 7: 8}):
             check_type(Length(2), obj)
@@ -385,32 +373,3 @@ class Test_Empty(TestCase):
                 assert e.wrong == int
             else:
                 raise AssertionError("Failed to raise _TC_TypeError")
-
-    def test_equality(self):
-        eq_tests = [
-            (Empty(list), Empty(list)),
-            (Empty(dict), Empty(dict)),
-            (Empty(set), Empty(set)) ]
-
-        ne_tests = [
-            (Empty(list), Empty(dict)),
-            (Empty(list), Empty(set)),
-            (Empty(dict), Empty(list)),
-            (Empty(dict), Empty(set)),
-            (Empty(set), Empty(list)),
-            (Empty(set), Empty(dict)), ]
-
-        self.multipleAssertEqual(eq_tests, ne_tests)
-
-    def test_hash(self):
-        eq_tests = [
-            (Empty(list), Empty(list)),
-            (Empty(dict), Empty(dict)),
-            (Empty(set), Empty(set)) ]
-
-        ne_tests = [
-            (Empty(list), Empty(dict)),
-            (Empty(list), Empty(set)),
-            (Empty(dict), Empty(set)) ]
-
-        self.multipleAssertEqualHashes(eq_tests, ne_tests)

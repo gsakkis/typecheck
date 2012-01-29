@@ -59,7 +59,7 @@ class UnorderedIteratorMixinTests(TestCase):
             assert isinstance(e.internal, _TC_IterationError)
             assert e.internal.iteration == 4
             assert isinstance(e.internal.inner, _TC_TypeError)
-            assert e.internal.inner.right == Or(int, float)
+            assert repr(e.internal.inner.right) == repr(Or(int, float))
             assert e.internal.inner.wrong == str
             self.assertEqual(str(e), "Argument itr: for MyIterator(5, 6, 9.0, 4, 'four'), at iteration 4 (value: 'four'), expected Or(<type 'float'>, <type 'int'>), got <type 'str'>")
         else:

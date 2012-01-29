@@ -5,14 +5,6 @@ class Length(TypeAnnotation):
         self.type = self
         self._length = int(length)
 
-    def __hash__(self):
-        return hash(str(self.__class__) + str(self._length))
-
-    def __eq__(self, other):
-        if self.__class__ is not other.__class__:
-            return False
-        return self._length == other._length
-
     def __typecheck__(self, func, to_check):
         try:
             length = len(to_check)

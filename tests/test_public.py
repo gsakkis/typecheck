@@ -1067,7 +1067,7 @@ class SetTests(TestCase):
         except _TC_KeyError, e:
             assert e.key == 's'
             assert isinstance(e.inner, _TC_TypeError)
-            assert e.inner.right == Or(int, float)
+            assert repr(e.inner.right) == repr(Or(int, float))
             assert e.inner.wrong == str
         else:
             raise AssertionError("Did not raise the proper exception")
@@ -1084,45 +1084,6 @@ class SetTests(TestCase):
             assert e.inner.wrong == (int, float)
         else:
             raise AssertionError("Did not raise the proper exception")
-
-    def test_equality(self):
-        class A(object): pass
-        class B(A): pass
-
-        eq_tests = [
-            (Set([str]), Set([str])),
-            (Set([A, B]), Set([A, B])),
-            (Set([int, int, str]), Set([int, str])),
-            (Set([int, str]), Set([str, int])),
-            (Set([Set([int, float]), int]), Set([Set([float, int]), int])),
-            (Set([Set([int, str]), Set([int, str])]), Set([Set([int, str])])) ]
-
-        ne_tests = [
-            (Set([A, B]), Set([B, B])),
-            (Set([A, B]), Set([A, A])),
-            (Set([Set([int, str])]), Set([Set([Set([int, str])])])),
-            (Set([int, int]), set([int, int])) ]
-
-        self.multipleAssertEqual(eq_tests, ne_tests)
-
-    def test_hash(self):
-        class A(object): pass
-        class B(A): pass
-
-        eq_tests = [
-            (Set([str]), Set([str])),
-            (Set([A, B]), Set([A, B])),
-            (Set([int, int, str]), Set([int, str])),
-            (Set([int, str]), Set([str, int])),
-            (Set([Set([int, float]), int]), Set([Set([float, int]), int])),
-            (Set([Set([int, str]), Set([int, str])]), Set([Set([int, str])])) ]
-
-        ne_tests = [
-            (Set([A, B]), Set([B, B])),
-            (Set([A, B]), Set([A, A])),
-            (Set([Set([int, str])]), Set([Set([Set([int, str])])])) ]
-
-        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
     def test_Type_uses_it(self):
         from typecheck import Type

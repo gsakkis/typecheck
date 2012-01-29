@@ -28,16 +28,6 @@ class Test_Or(TestCase):
         else:
             raise AssertionError("Failed to raise TypeError")
 
-    def test_distinct_parameters(self):
-        from typecheck import Or
-
-        try:
-            Or(int, int)
-        except TypeError, e:
-            self.assertEqual(str(e), "there must be at least 2 distinct parameters to __init__()")
-        else:
-            raise AssertionError("Failed to raise TypeError")
-
     def test_success(self):
         from typecheck import Or, And
 
@@ -65,48 +55,10 @@ class Test_Or(TestCase):
         try:
             self.or_type("foo")
         except _TC_TypeError, e:
-            assert e.right == Or(int, float)
+            assert repr(e.right) == repr(Or(int, float))
             assert e.wrong == str
         else:
             self.fail("Passed incorrectly")
-
-    def test_equality(self):
-        from typecheck import Or, And
-
-        eq_tests = [
-            (Or(int, float), Or(int, float)),
-            (Or(int, float), Or(int, int, int, float)),
-            (Or(int, int, int, float), Or(int, float)),
-            (Or(int, float), Or(float, int)),
-            (Or(Or(int, str), float), Or(float, Or(str, int))),
-            (Or(Or(int, str), float), Or(int, str, float)) ]
-
-        ne_tests = [
-            (Or(float, str), Or(int, float)),
-            (Or(int, float, str), Or(int, float)),
-            (Or(int, float), Or(int, float, str)),
-            (Or(int, float), And(int, float)) ]
-
-        self.multipleAssertEqual(eq_tests, ne_tests)
-
-    def test_hash(self):
-        from typecheck import Or, And
-
-        eq_tests = [
-            (Or(int, float), Or(int, float)),
-            (Or(int, float), Or(int, int, int, float)),
-            (Or(int, int, int, float), Or(int, float)),
-            (Or(int, float), Or(float, int)),
-            (Or(Or(int, str), float), Or(float, Or(str, int))),
-            (Or(Or(int, str), float), Or(int, str, float)) ]
-
-        ne_tests = [
-            (Or(float, str), Or(int, float)),
-            (Or(int, float, str), Or(int, float)),
-            (Or(int, float), Or(int, float, str)),
-            (Or(int, float), And(int, float)) ]
-
-        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
 class Test_And(TestCase):
     def test_IsAllOf_alias(self):
@@ -123,66 +75,17 @@ class Test_And(TestCase):
 
         check_type(And(A, B), C())
 
-    def test_distinct_parameters(self):
-        from typecheck import And
-
-        try:
-            And(int, int)
-        except TypeError, e:
-            self.assertEqual(str(e), "there must be at least 2 distinct parameters to __init__()")
-        else:
-            raise AssertionError("Failed to raise TypeError")
-
     def test_failure(self):
         from typecheck import _TC_TypeError, And
 
         try:
             check_type(And(int, float), "foo")
         except _TC_TypeError, e:
-            assert e.right == And(int, float)
+            assert repr(e.right) == repr(And(int, float))
             assert e.wrong == str
         else:
             self.fail("Passed incorrectly")
 
-    def test_equality(self):
-        from typecheck import And, Or
-
-        eq_tests = [
-            (And(int, float), And(int, float)),
-            (And(int, float), And(int, int, int, float)),
-            (And(int, int, int, float), And(int, float)),
-            (And(int, float), And(float, int)),
-            (And(And(int, str), float), And(float, And(str, int))),
-            (And(And(int, str), float), And(int, str, float)),
-            (And(And(int, float), And(str, int)), And(int, float, str)) ]
-
-        ne_tests = [
-            (And(float, str), And(int, float)),
-            (And(int, float, str), And(int, float)),
-            (And(int, float), And(int, float, str)),
-            (And(int, float), Or(int, float)) ]
-
-        self.multipleAssertEqual(eq_tests, ne_tests)
-
-    def test_hash(self):
-        from typecheck import And, Or
-
-        eq_tests = [
-            (And(int, float), And(int, float)),
-            (And(int, float), And(int, int, int, float)),
-            (And(int, int, int, float), And(int, float)),
-            (And(int, float), And(float, int)),
-            (And(And(int, str), float), And(float, And(str, int))),
-            (And(And(int, str), float), And(int, str, float)),
-            (And(And(int, float), And(str, int)), And(int, float, str)) ]
-
-        ne_tests = [
-            (And(float, str), And(int, float)),
-            (And(int, float, str), And(int, float)),
-            (And(int, float), And(int, float, str)),
-            (And(int, float), Or(int, float)) ]
-
-        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
 class Test_Not(TestCase):
     def test_IsNoneOf_alias(self):
@@ -218,7 +121,7 @@ class Test_Not(TestCase):
         try:
             check_type(Not(int), 4)
         except _TC_TypeError, e:
-            assert e.right == Not(int)
+            assert repr(e.right) == repr(Not(int))
             assert e.wrong == int
         else:
             self.fail("Passed incorrectly")
@@ -229,7 +132,7 @@ class Test_Not(TestCase):
         try:
             check_type(Not(int, float), 4.0)
         except _TC_TypeError, e:
-            assert e.right == Not(int, float)
+            assert repr(e.right) == repr(Not(int, float))
             assert e.wrong == float
         else:
             self.fail("Passed incorrectly")
@@ -244,50 +147,10 @@ class Test_Not(TestCase):
         try:
             check_type(Not(A, B, int), C())
         except _TC_TypeError, e:
-            assert e.right == Not(A, B, int)
+            assert repr(e.right) == repr(Not(A, B, int))
             assert e.wrong == C
         else:
             self.fail("Passed incorrectly")
-
-    def test_equality(self):
-        from typecheck import Not, Or
-
-        eq_tests = [
-            (Not(int, float), Not(int, float)),
-            (Not(int, float), Not(int, int, int, float)),
-            (Not(int, int, int, float), Not(int, float)),
-            (Not(int, float), Not(float, int)),
-            (Not(Not(int, str), float), Not(float, Not(str, int))) ]
-
-        ne_tests = [
-            (Not(float, str), Not(int, float)),
-            (Not(int, float, str), Not(int, float)),
-            (Not(int, float), Not(int, float, str)),
-            (Not(int, float), Or(int, float)),
-            (Not(Not(int, str), float), Not(int, str, float)),
-            (Not(Not(int, float), Not(str, int)), Not(int, float, str)) ]
-
-        self.multipleAssertEqual(eq_tests, ne_tests)
-
-    def test_hash(self):
-        from typecheck import Not, Or
-
-        eq_tests = [
-            (Not(int, float), Not(int, float)),
-            (Not(int, float), Not(int, int, int, float)),
-            (Not(int, int, int, float), Not(int, float)),
-            (Not(int, float), Not(float, int)),
-            (Not(Not(int, str), float), Not(float, Not(str, int))) ]
-
-        ne_tests = [
-            (Not(float, str), Not(int, float)),
-            (Not(int, float, str), Not(int, float)),
-            (Not(int, float), Not(int, float, str)),
-            (Not(int, float), Or(int, float)),
-            (Not(Not(int, str), float), Not(int, str, float)),
-            (Not(Not(int, float), Not(str, int)), Not(int, float, str)) ]
-
-        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
 class Test_Any(TestCase):
     def test_args_and_return_pass(self):
@@ -315,18 +178,6 @@ class Test_Any(TestCase):
         assert foo(5).next() == 5
         assert foo({}).next() == {}
         assert foo(foo).next() == foo
-
-    def test_equality(self):
-        from typecheck import Any
-
-        assert Any() == Any()
-        assert not Any() != Any()
-
-    def test_hash(self):
-        from typecheck import Any
-
-        assert hash(Any()) == hash(Any())
-        assert not hash(Any()) != hash(Any())
 
 class Test_IsCallable(TestCase):
     def test_accepts_no_args(self):
@@ -405,16 +256,6 @@ class Test_IsCallable(TestCase):
         else:
             raise AssertionError("Failed to raise TypeCheckError")
 
-    def test_equality(self):
-        from typecheck import IsCallable
-
-        assert IsCallable() == IsCallable()
-        assert not IsCallable() != IsCallable()
-
-    def test_hash(self):
-        from typecheck import IsCallable
-
-        assert hash(IsCallable()) == hash(IsCallable())
 
 class Test_HasAttr(TestCase):
     def test_empty(self):
@@ -499,46 +340,6 @@ class Test_HasAttr(TestCase):
             else:
                 raise AssertionError("Did not raise _TC_AttrError")
 
-    def test_equality(self):
-        from typecheck import HasAttr, Any
-
-        eq_tests = [
-            (HasAttr(['a']), HasAttr(['a'])),
-            (HasAttr(['a', 'b']), HasAttr(['b', 'a'])),
-            (HasAttr({'a': int}), HasAttr({'a': int})),
-            (HasAttr({'a': int, 'b': int}), HasAttr({'b': int, 'a': int})),
-            (HasAttr({'a': HasAttr(['a'])}), HasAttr({'a': HasAttr(['a'])})),
-            (HasAttr(['a'], {'b': int, 'c': int}), HasAttr(['a'], {'b': int, 'c': int})),
-            (HasAttr(['a']), HasAttr({'a': Any()})),
-            (HasAttr({'a': int, 'b': float, 'c': str}), HasAttr({'a': int, 'b': float, 'c': str})) ]
-
-        ne_tests = [
-            (HasAttr(['a', 'b']), HasAttr(['b'])),
-            (HasAttr(['a', 'b']), HasAttr(['a'], {'b': int})),
-            (HasAttr({'a': HasAttr(['a'])}), HasAttr({'a': HasAttr(['b'])})), ]
-
-        self.multipleAssertEqual(eq_tests, ne_tests, 100)
-
-    def test_hash(self):
-        from typecheck import HasAttr, Any
-
-        eq_tests = [
-            (HasAttr(['a']), HasAttr(['a'])),
-            (HasAttr(['a', 'b']), HasAttr(['b', 'a'])),
-            (HasAttr({'a': int}), HasAttr({'a': int})),
-            (HasAttr({'a': int, 'b': int}), HasAttr({'b': int, 'a': int})),
-            (HasAttr({'a': HasAttr(['a'])}), HasAttr({'a': HasAttr(['a'])})),
-            (HasAttr(['a'], {'b': int, 'c': int}), HasAttr(['a'], {'b': int, 'c': int})),
-            (HasAttr(['a']), HasAttr({'a': Any()})),
-            (HasAttr({'a': int, 'b': float, 'c': str}), HasAttr({'a': int, 'b': float, 'c': str})) ]
-
-        ne_tests = [
-            (HasAttr(['a', 'b']), HasAttr(['b'])),
-            (HasAttr(['a', 'b']), HasAttr(['a'], {'b': int})),
-            (HasAttr({'a': HasAttr(['a'])}), HasAttr({'a': HasAttr(['b'])})), ]
-
-        self.multipleAssertEqualHashes(eq_tests, ne_tests, 100)
-
 class Test_IsIterable(TestCase):
     def test_accepts_no_args(self):
         from typecheck import IsIterable
@@ -549,12 +350,6 @@ class Test_IsIterable(TestCase):
             assert str(e) == "__init__() takes exactly 1 argument (4 given)"
         else:
             raise AssertionError("Failed to raise TypeError")
-
-    def test_equality(self):
-        from typecheck import IsIterable
-
-        assert IsIterable() == IsIterable()
-        assert not IsIterable() != IsIterable()
 
     def test_success_builtins(self):
         from typecheck import IsIterable
@@ -622,10 +417,6 @@ class Test_IsIterable(TestCase):
         else:
             raise AssertionError("Failed to raise _TC_TypeError")
 
-    def test_hash(self):
-        from typecheck import IsIterable
-
-        assert hash(IsIterable()) == hash(IsIterable())
 
 class Test_YieldSeq(TestCase):
     def test_bad_seq(self):
@@ -749,40 +540,6 @@ class Test_YieldSeq(TestCase):
         else:
             raise AssertionError("Did not raise TypeCheckError")
 
-    def test_equality(self):
-        from typecheck import YieldSeq, And
-
-        eq_tests = [
-            (YieldSeq(int, float), YieldSeq(int, float)),
-            (YieldSeq(And(int, str), float), YieldSeq(And(int, str), float)) ]
-
-        ne_tests = [
-            (YieldSeq(float, str), YieldSeq(int, float)),
-            (YieldSeq(int, float), YieldSeq(int, int, int, float)),
-            (YieldSeq(int, float, str), YieldSeq(int, float)),
-            (YieldSeq(int, float), YieldSeq(int, float, str)),
-            (YieldSeq(int, float), And(int, float)),
-            (YieldSeq(int, int, int, float), YieldSeq(int, float)) ]
-
-        self.multipleAssertEqual(eq_tests, ne_tests)
-
-    def test_hash(self):
-        from typecheck import YieldSeq, And
-
-        eq_tests = [
-            (YieldSeq(int, float), YieldSeq(int, float)),
-            (YieldSeq(And(int, str), float), YieldSeq(And(int, str), float)) ]
-
-        ne_tests = [
-            (YieldSeq(float, str), YieldSeq(int, float)),
-            (YieldSeq(int, float), YieldSeq(int, int, int, float)),
-            (YieldSeq(int, float, str), YieldSeq(int, float)),
-            (YieldSeq(int, float), YieldSeq(int, float, str)),
-            (YieldSeq(int, float), And(int, float)),
-            (YieldSeq(int, int, int, float), YieldSeq(int, float)) ]
-
-        self.multipleAssertEqualHashes(eq_tests, ne_tests)
-
 class Test_Xor(TestCase):
     def test_IsOnlyOneOf_alias(self):
         from typecheck import Xor, IsOnlyOneOf
@@ -796,16 +553,6 @@ class Test_Xor(TestCase):
             Xor()
         except TypeError, e:
             self.assertEqual(str(e), "__init__() takes at least 3 arguments (1 given)")
-        else:
-            raise AssertionError("Failed to raise TypeError")
-
-    def test_distinct_parameters(self):
-        from typecheck import Xor
-
-        try:
-            Xor(int, int)
-        except TypeError, e:
-            self.assertEqual(str(e), "there must be at least 2 distinct parameters to __init__()")
         else:
             raise AssertionError("Failed to raise TypeError")
 
@@ -824,7 +571,7 @@ class Test_Xor(TestCase):
         except _TC_XorError, e:
             assert e.matched_conds == 0
             assert isinstance(e.inner, _TC_TypeError)
-            assert e.inner.right == Xor(dict, IsIterable())
+            assert repr(e.inner.right) == repr(Xor(dict, IsIterable()))
             assert e.inner.wrong == int
             self.assertEqual(e.error_message(), ", expected Xor(<type 'dict'>, IsIterable()), got <type 'int'> (matched neither assertion)")
         else:
@@ -839,51 +586,11 @@ class Test_Xor(TestCase):
         except _TC_XorError, e:
             assert e.matched_conds == 2
             assert isinstance(e.inner, _TC_TypeError)
-            assert e.inner.right == Xor(dict, IsIterable())
+            assert repr(e.inner.right) == repr(Xor(dict, IsIterable()))
             assert e.inner.wrong == {str: int}
             self.assertEqual(e.error_message(), ", expected Xor(<type 'dict'>, IsIterable()), got {<type 'str'>: <type 'int'>} (matched both assertions)")
         else:
             raise AssertionError("Failed to raise _TC_TypeError")
-
-    def test_equality(self):
-        from typecheck import Xor, Or
-
-        eq_tests = [
-            (Xor(int, float), Xor(int, float)),
-            (Xor(int, float), Xor(int, int, int, float)),
-            (Xor(int, int, int, float), Xor(int, float)),
-            (Xor(int, float), Xor(float, int)),
-            (Xor(Xor(int, str), float), Xor(float, Xor(str, int))),
-            (Xor(Xor(int, str), float), Xor(int, str, float)),
-            (Xor(Xor(int, float), Xor(str, int)), Xor(int, float, str)) ]
-
-        ne_tests = [
-            (Xor(float, str), Xor(int, float)),
-            (Xor(int, float, str), Xor(int, float)),
-            (Xor(int, float), Xor(int, float, str)),
-            (Xor(int, float), Or(int, float)) ]
-
-        self.multipleAssertEqual(eq_tests, ne_tests)
-
-    def test_hash(self):
-        from typecheck import Xor, Or
-
-        eq_tests = [
-            (Xor(int, float), Xor(int, float)),
-            (Xor(int, float), Xor(int, int, int, float)),
-            (Xor(int, int, int, float), Xor(int, float)),
-            (Xor(int, float), Xor(float, int)),
-            (Xor(Xor(int, str), float), Xor(float, Xor(str, int))),
-            (Xor(Xor(int, str), float), Xor(int, str, float)),
-            (Xor(Xor(int, float), Xor(str, int)), Xor(int, float, str)) ]
-
-        ne_tests = [
-            (Xor(float, str), Xor(int, float)),
-            (Xor(int, float, str), Xor(int, float)),
-            (Xor(int, float), Xor(int, float, str)),
-            (Xor(int, float), Or(int, float)) ]
-
-        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
 class Test_Exact(TestCase):
     def test_constructor(self):
@@ -902,39 +609,6 @@ class Test_Exact(TestCase):
             assert str(e) == "__init__() takes exactly 2 arguments (3 given)"
         else:
             raise AssertionError("Failed to raise TypeError")
-
-    def test_equality(self):
-        from typecheck import Exact
-
-        eq_tests = [
-                    (Exact(4), Exact(4)),
-                    (Exact([4, 5]), Exact([4, 5])),
-                    (Exact(Exact), Exact(Exact)) ]
-
-        ne_tests = [
-                    (Exact(4), Exact(5)),
-                    (Exact([5, 4]), Exact([4, 5])),
-                    (Exact(Exact), Exact(object)),
-                    (Exact(object), Exact(dict)) ]
-
-        self.multipleAssertEqual(eq_tests, ne_tests)
-
-    def test_hash(self):
-        from typecheck import Exact
-
-        eq_tests = [
-                    (Exact(4), Exact(4)),
-                    (Exact([4, 5]), Exact([4, 5])),
-                    (Exact(Exact), Exact(Exact)) ]
-
-        ne_tests = [
-                    (Exact(4), Exact(5)),
-                    (Exact([5, 4]), Exact([4, 5])),
-                    (Exact(Exact), Exact(object)),
-                    (Exact(object), Exact(dict)),
-                    (Exact([5, 4]), Exact(set([]))) ]
-
-        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
     def test_pass(self):
         from typecheck import Exact, Or
@@ -959,8 +633,8 @@ class Test_Exact(TestCase):
         try:
             check_type(Exact(Exact), Exact(5))
         except _TC_ExactError, e:
-            assert e.right == Exact
-            assert e.wrong == Exact(5)
+            assert repr(e.right) == repr(Exact)
+            assert repr(e.wrong) == repr(Exact(5))
         else:
             raise AssertionError("Failed to raise _TC_ExactError")
 
@@ -970,8 +644,8 @@ class Test_Exact(TestCase):
         try:
             check_type(Exact(TypeAnnotation), Exact)
         except _TC_ExactError, e:
-            assert e.right == TypeAnnotation
-            assert e.wrong == Exact
+            assert repr(e.right) == repr(TypeAnnotation)
+            assert repr(e.wrong) == repr(Exact)
         else:
             raise AssertionError("Failed to raise _TC_ExactError")
 
@@ -984,49 +658,6 @@ class Test_Exact(TestCase):
             check_type(or_type, num)
 
 class Test_Class(TestCase):
-    def test_equality(self):
-        from typecheck import Class
-
-        assert Class("ClassB") == Class("ClassB")
-        assert not Class("ClassB") != Class("ClassB")
-
-        assert Class("ClassA") != Class("ClassB")
-        assert not Class("ClassA") == Class("ClassB")
-
-        classb_1 = Class("ClassB")
-
-        class ClassB(object):
-            pass
-
-        classb_2 = Class("ClassB")
-
-        assert classb_1 == classb_2
-        assert not classb_1 != classb_2
-
-        check_type(classb_2, ClassB())
-
-        assert classb_1 == classb_2
-        assert not classb_1 != classb_2
-
-    def test_hash(self):
-        from typecheck import Class
-
-        assert hash(Class("ClassB")) == hash(Class("ClassB"))
-        assert hash(Class("ClassA")) != hash(Class("ClassB"))
-        assert hash(Class("ClassA")) != hash("ClassA")
-
-        classb_1 = Class("ClassB")
-
-        class ClassB(object):
-            pass
-
-        classb_2 = Class("ClassB")
-
-        assert hash(classb_1) == hash(classb_2)
-
-        check_type(classb_2, ClassB())
-
-        assert hash(classb_1) == hash(classb_2)
 
     def test_no_class(self):
         from typecheck import Class, accepts
@@ -1189,7 +820,7 @@ class Test_Typeclass(TestCase):
         except _TC_AttrError, e:
             assert e.attr == 'foo'
             assert isinstance(e.inner, _TC_TypeError)
-            assert e.inner.right == IsCallable()
+            assert repr(e.inner.right) == repr(IsCallable())
             assert e.inner.wrong == int
         else:
             raise AssertionError("Failed to raise _TC_AttrError")
@@ -1280,30 +911,6 @@ class Test_Typeclass(TestCase):
         for itr_type in (tuple, list, set, gen):
             run_test(itr_type)
 
-    def test_equality(self):
-        from typecheck import Typeclass
-
-        eq_tests = [ (Typeclass(int), Typeclass(int)),
-                     (Typeclass(int, float), Typeclass(float, int)),
-                     (Typeclass(int, int), Typeclass(int)),
-                     (Typeclass(int), Typeclass(Typeclass(int))) ]
-
-        ne_tests = [ (Typeclass(int), Typeclass(float)) ]
-
-        self.multipleAssertEqual(eq_tests, ne_tests)
-
-    def test_hash(self):
-        from typecheck import Typeclass
-
-        eq_tests = [ (Typeclass(int), Typeclass(int)),
-                     (Typeclass(int, float), Typeclass(float, int)),
-                     (Typeclass(int, int), Typeclass(int)),
-                     (Typeclass(int), Typeclass(Typeclass(int))) ]
-
-        ne_tests = [ (Typeclass(int), Typeclass(float)) ]
-
-        self.multipleAssertEqualHashes(eq_tests, ne_tests)
-
     def test_cope_with_class_changes(self):
         from typecheck import Typeclass, _TC_AttrError, _TC_TypeError
         from typecheck import IsCallable
@@ -1332,7 +939,7 @@ class Test_Typeclass(TestCase):
         except _TC_AttrError, e:
             assert e.attr == 'foo'
             assert isinstance(e.inner, _TC_TypeError)
-            assert e.inner.right == IsCallable()
+            assert repr(e.inner.right) == repr(IsCallable())
             assert e.inner.wrong == int
         else:
             raise AssertionError("Failed to raise _TC_AttrError")

@@ -398,19 +398,11 @@ def calculate_type(obj):
 
 # The base class for all the other utility classes
 class TypeAnnotation(object):
+    
     def __repr__(self):
         return type(self).name + '(' + ', '.join(sorted(repr(t) for t in self._types)) + ')'
 
     __str__ = __repr__
-
-    def __eq__(self, other):
-        return not self != other
-
-    def __ne__(self, other):
-        return not self == other
-
-    def __hash__(self):
-        raise NotImplementedError("Incomplete TypeAnnotation subclass: %s" % self.__class__)
 
     def __typecheck__(self, func, obj):
         raise NotImplementedError("Incomplete TypeAnnotation subclass: %s" % self.__class__)
@@ -434,14 +426,6 @@ class AtomicType(TypeAnnotation):
     def __typecheck__(self, func, to_check):
         if not isinstance(to_check, self.type):
             raise _TC_TypeError(to_check, self.type)
-
-    def __eq__(self, other):
-        if other.__class__ is not self.__class__:
-            return False
-        return self.type == other.type
-
-    def __hash__(self):
-        return hash(str(hash(self.__class__)) + str(hash(self.type)))
 
     # XXX Is this really a good idea?
     # Removing this only breaks 3 tests; that seems suspiciously low
@@ -479,21 +463,6 @@ class Dict(TypeAnnotation):
                 check_type(self.__check_val, func, v)
             except _TC_Exception, inner:
                 raise _TC_KeyValError(k, v, inner)
-
-    def __eq__(self, other):
-        if other.__class__ is not self.__class__:
-            return False
-        return self.type == other.type
-
-    def __hash__(self):
-        cls = self.__class__
-        key = self.__check_key
-        val = self.__check_val
-
-        def strhash(obj):
-            return str(hash(obj))
-
-        return hash(''.join(map(strhash, [cls, key, val])))
 
     @classmethod
     def __typesig__(cls, obj):
@@ -537,24 +506,6 @@ class List(TypeAnnotation):
                 check_type(type, func, val)
             except _TC_Exception, e:
                 raise _TC_IndexError(i, e)
-
-    def __eq__(self, other):
-        if other.__class__ is not self.__class__:
-            return False
-
-        if len(self._types) != len(other._types):
-            return False
-
-        for (s, o) in zip(self._types, other._types):
-            if s != o:
-                return False
-        return True
-
-    def __hash__(self):
-        def strhash(obj):
-            return str(hash(obj))
-
-        return hash(''.join(map(strhash, [self.__class__] + self._types)))
 
     @classmethod
     def __typesig__(cls, obj):
@@ -630,14 +581,6 @@ class Set(TypeAnnotation):
             if error:
                 raise _TC_KeyError(obj, _TC_TypeError(obj, self._type))
 
-    def __eq__(self, other):
-        if self.__class__ is not other.__class__:
-            return False
-        return self.type == other.type
-
-    def __hash__(self):
-        return hash(str(hash(self.__class__)) + str(hash(frozenset(self.type))))
-
     @classmethod
     def __typesig__(self, obj):
         if isinstance(obj, set):
@@ -664,16 +607,6 @@ class TypeVariables(TypeAnnotation):
         return "TypeVariable(%s)" % self.type
 
     __repr__ = __str__
-
-    def __hash__(self):
-        return hash(''.join([str(o) for o in self.__class__
-                                           , hash(type(self.type))
-                                           , hash(self.type)]))
-
-    def __eq__(self, other):
-        if self.__class__ is not other.__class__:
-            return False
-        return type(self.type) is type(other.type) and self.type == other.type
 
     def __typecheck__(self, func, to_check):
         name = self.type
@@ -755,14 +688,6 @@ class CheckerFunction(TypeAnnotation):
     def __repr__(self):
         return str(self)
 
-    def __eq__(self, other):
-        if self.__class__ is not other.__class__:
-            return False
-        return self._func is other._func
-
-    def __hash__(self):
-        return hash(str(self.__class__) + str(hash(self._func)))
-
 # Register some of the above types so that Type() knows about them
 for c in (TypeAnnotation, List, Tuple, Dict, Set, AtomicType, TypeVariables, CheckerFunction):
     register_type(c)
@@ -787,37 +712,18 @@ class Any(TypeAnnotation):
 
     __repr__ = __str__
 
-    # All instances of this class are equal
-    def __eq__(self, other):
-        return other.__class__ is self.__class__
-
-    def __hash__(self):
-        return hash(self.__class__)
-
 ### Base class for Or() and And()
 class _Boolean(TypeAnnotation):
     def __init__(self, first_type, second_type, *types):
         self._types = set()
 
-        for t in (first_type, second_type)+types:
+        for t in ((first_type, second_type)+types):
             if type(t) is type(self):
                 self._types.update(t._types)
             else:
                 self._types.add(Type(t))
 
-        if len(self._types) < 2:
-            raise TypeError("there must be at least 2 distinct parameters to __init__()")
-
         self.type = self
-
-    def __eq__(self, other):
-        if other.__class__ is not self.__class__:
-            return False
-
-        return self._types == other._types
-
-    def __hash__(self):
-        return hash(str(hash(self.__class__)) + str(hash(frozenset(self._types))))
 
 class Or(_Boolean):
     name = "Or"
@@ -888,14 +794,6 @@ class IsCallable(TypeAnnotation):
 
     __repr__ = __str__
 
-    # They're all the same
-    # XXX Change IsCallable to a singleton class
-    def __hash__(self):
-        return id(self.__class__)
-
-    def __eq__(self, other):
-        return self.__class__ is other.__class__
-
     def __typecheck__(self, func, to_check):
         if not callable(to_check):
             raise _TC_TypeError(to_check, 'a callable')
@@ -926,14 +824,6 @@ class HasAttr(TypeAnnotation):
             except _TC_Exception, e:
                 raise _TC_AttrError(attr, e)
 
-    def __eq__(self, other):
-        if self.__class__ is not other.__class__:
-            return False
-        return self._attr_types == other._attr_types
-
-    def __hash__(self):
-        return hash(str(hash(self.__class__)) + str(hash(str(self._attr_types))))
-
     def __str__(self):
         any_type = []
         spec_type = {}
@@ -956,14 +846,6 @@ class IsIterable(TypeAnnotation):
     def __init__(self):
         self.type = self
 
-    def __eq__(self, other):
-        return self.__class__ is other.__class__
-
-    # They're all the same
-    # XXX Change IsIterable to a singleton class
-    def __hash__(self):
-        return id(self.__class__)
-
     def __str__(self):
         return "IsIterable()"
 
@@ -982,21 +864,10 @@ class YieldSeq(TypeAnnotation):
         self._type = [type_1, type_2] + list(types)
         self._types = [Type(t) for t in self._type]
 
-    def __hash__(self):
-        return id(self)
-
     def __str__(self):
         return "YieldSeq(" + ", ".join(map(str, self._type)) + ")"
 
     __repr__ = __str__
-
-    def __eq__(self, other):
-        if self.__class__ is not other.__class__:
-            return False
-        return self._types == other._types
-
-    def __hash__(self):
-        return hash(str(self.__class__) + str([hash(t) for t in self._types]))
 
     # We have to use __{start,stop}checking__ so that the indexes get
     # reset every time we run through the typechecking sequence
@@ -1031,18 +902,10 @@ class Exact(TypeAnnotation):
         self.type = self
         self._obj = obj
 
-    def __hash__(self):
-        try:
-            obj_hash = str(hash(self._obj))
-        except TypeError:
-            obj_hash = str(type(self._obj)) + str(self._obj)
+    def __str__(self):
+        return "Exact(%r)" % self._obj
 
-        return hash(str(self.__class__) + obj_hash)
-
-    def __eq__(self, other):
-        if self.__class__ is not other.__class__:
-            return False
-        return self._obj == other._obj
+    __repr__ = __str__
 
     def __typecheck__(self, func, to_check):
         if self._obj != to_check:
@@ -1055,18 +918,10 @@ class Class(TypeAnnotation):
         self.class_obj = None
         self._frame = sys._getframe(1)
 
-    def __hash__(self):
-        return hash(str(self.__class__) + self.class_name)
-
     def __str__(self):
         return "Class('%s')" % self.class_name
 
     __repr__ = __str__
-
-    def __eq__(self, other):
-        if self.__class__ is not other.__class__:
-            return False
-        return self.class_name == other.class_name
 
     def __typecheck__(self, func, to_check):
         if self.class_obj is None:
@@ -1164,14 +1019,6 @@ class Typeclass(TypeAnnotation):
                 raise _TC_AttrError(method, _TC_TypeError(attr, IsCallable()))
 
         self._cache.add(to_check.__class__)
-
-    def __eq__(self, other):
-        if self.__class__ is not other.__class__:
-            return False
-        return self._instances == other._instances
-
-    def __hash__(self):
-        return hash(str(self.__class__) + str(hash(frozenset(self._instances))))
 
     def __repr__(self):
         return object.__repr__(self)
