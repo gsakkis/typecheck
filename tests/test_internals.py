@@ -757,109 +757,109 @@ class ExtensibleSigTests(TestCase):
         else:
             raise AssertionError("Succeeded incorrectly")
 
-class Test_Function(TestCase):
+class Test_CheckerFunction(TestCase):
     def test_works_with_Type_function(self):
-        from typecheck import Type, Function
+        from typecheck import Type, CheckerFunction
 
         def foo(*vargs):
             return vargs
 
-        assert isinstance(Type(foo), Function)
+        assert isinstance(Type(foo), CheckerFunction)
 
     def test_works_with_Type_call_method_newstyle(self):
-        from typecheck import Type, Function
+        from typecheck import Type, CheckerFunction
 
         class Foo(object):
             def __call__(self, *vargs):
                 return vargs
 
-        assert isinstance(Type(Foo()), Function)
+        assert isinstance(Type(Foo()), CheckerFunction)
 
     def test_works_with_Type_call_method_classic(self):
-        from typecheck import Type, Function
+        from typecheck import Type, CheckerFunction
 
         class Foo:
             def __call__(self, *vargs):
                 return vargs
 
-        assert isinstance(Type(Foo()), Function)
+        assert isinstance(Type(Foo()), CheckerFunction)
 
     def test_works_with_Type_classmethod_newstyle(self):
-        from typecheck import Type, Function
+        from typecheck import Type, CheckerFunction
 
         class Foo(object):
             @classmethod
             def foo(cls, *vargs):
                 return vargs
 
-        assert isinstance(Type(Foo.foo), Function)
+        assert isinstance(Type(Foo.foo), CheckerFunction)
 
     def test_works_with_Type_classmethod_classic(self):
-        from typecheck import Type, Function
+        from typecheck import Type, CheckerFunction
 
         class Foo:
             @classmethod
             def foo(cls, *vargs):
                 return vargs
 
-        assert isinstance(Type(Foo.foo), Function)
+        assert isinstance(Type(Foo.foo), CheckerFunction)
 
     def test_works_with_Type_instancemethod_newstyle(self):
-        from typecheck import Type, Function
+        from typecheck import Type, CheckerFunction
 
         class Foo(object):
             def foo(self, *vargs):
                 return vargs
 
-        assert isinstance(Type(Foo().foo), Function)
+        assert isinstance(Type(Foo().foo), CheckerFunction)
 
     def test_works_with_Type_instancemethod_classic(self):
-        from typecheck import Type, Function
+        from typecheck import Type, CheckerFunction
 
         class Foo:
             def foo(self, *vargs):
                 return vargs
 
-        assert isinstance(Type(Foo().foo), Function)
+        assert isinstance(Type(Foo().foo), CheckerFunction)
 
     def test_works_with_Type_staticmethod_newstyle(self):
-        from typecheck import Type, Function
+        from typecheck import Type, CheckerFunction
 
         class Foo(object):
             @staticmethod
             def foo(*vargs):
                 return vargs
 
-        assert isinstance(Type(Foo.foo), Function)
+        assert isinstance(Type(Foo.foo), CheckerFunction)
 
     def test_works_with_Type_staticmethod_classic(self):
-        from typecheck import Type, Function
+        from typecheck import Type, CheckerFunction
 
         class Foo:
             @staticmethod
             def foo(*vargs):
                 return vargs
 
-        assert isinstance(Type(Foo.foo), Function)
+        assert isinstance(Type(Foo.foo), CheckerFunction)
 
     def test_str(self):
-        from typecheck import Function
+        from typecheck import CheckerFunction
 
         def foo(*vargs):
             return vargs
 
-        assert str(Function(foo)) == "Function(%s)" % foo
+        assert str(CheckerFunction(foo)) == "CheckerFunction(%s)" % foo
 
     def test_repr(self):
-        from typecheck import Function
+        from typecheck import CheckerFunction
 
         def foo(*vargs):
             return vargs
 
-        assert repr(Function(foo)) == "Function(%s)" % foo
+        assert repr(CheckerFunction(foo)) == "CheckerFunction(%s)" % foo
 
     def test_check_type_errors_pass_through(self):
-        from typecheck import Function
+        from typecheck import CheckerFunction
 
         class MyCustomException(Exception):
             pass
@@ -868,69 +868,69 @@ class Test_Function(TestCase):
             raise MyCustomException(*vargs)
 
         try:
-            check_type(Function(checker_function), 66)
+            check_type(CheckerFunction(checker_function), 66)
         except MyCustomException, e:
             assert e.args == (66,)
         else:
             raise AssertionError("Failed to raise MyCustomException")
 
     def test_check_type_None_means_success(self):
-        from typecheck import Function
+        from typecheck import CheckerFunction
 
         def checker_function(*vargs):
             return None
 
-        check_type(Function(checker_function), 66)
+        check_type(CheckerFunction(checker_function), 66)
 
     def test_check_type_true_values_mean_success(self):
-        from typecheck import Function
+        from typecheck import CheckerFunction
 
         def checker_function1(*vargs):
             return True
-        check_type(Function(checker_function1), 66)
+        check_type(CheckerFunction(checker_function1), 66)
 
         def checker_function2(*vargs):
             return 5
-        check_type(Function(checker_function2), 66)
+        check_type(CheckerFunction(checker_function2), 66)
 
         def checker_function3(*vargs):
             return "abc"
-        check_type(Function(checker_function3), 66)
+        check_type(CheckerFunction(checker_function3), 66)
 
     def test_check_type_false_values_mean_success(self):
-        from typecheck import Function
+        from typecheck import CheckerFunction
 
         def checker_function1(*vargs):
             return []
-        check_type(Function(checker_function1), 66)
+        check_type(CheckerFunction(checker_function1), 66)
 
         def checker_function2(*vargs):
             return {}
-        check_type(Function(checker_function2), 66)
+        check_type(CheckerFunction(checker_function2), 66)
 
     def test_check_type_False_means_failure(self):
-        from typecheck import Function, _TC_FunctionError
+        from typecheck import CheckerFunction, _TC_CheckerFunctionError
 
         def checker_function1(*vargs):
             return False
         try:
-            check_type(Function(checker_function1), 66)
-        except _TC_FunctionError, e:
+            check_type(CheckerFunction(checker_function1), 66)
+        except _TC_CheckerFunctionError, e:
             assert e.checking_func is checker_function1
             assert e.rejected_obj == 66
         else:
-            raise AssertionError("Failed to raise _TC_FunctionError")
+            raise AssertionError("Failed to raise _TC_CheckerFunctionError")
 
         # (0 == False) == True
         def checker_function2(*vargs):
             return 0
         try:
-            check_type(Function(checker_function2), 66)
-        except _TC_FunctionError, e:
+            check_type(CheckerFunction(checker_function2), 66)
+        except _TC_CheckerFunctionError, e:
             assert e.checking_func is checker_function2
             assert e.rejected_obj == 66
         else:
-            raise AssertionError("Failed to raise _TC_FunctionError")
+            raise AssertionError("Failed to raise _TC_CheckerFunctionError")
 
 def convert_mapping(mapping):
     if mapping is None:

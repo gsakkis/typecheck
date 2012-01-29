@@ -3,7 +3,7 @@ __all__ = ['accepts', 'returns', 'yields', 'TypeCheckError', 'Length', 'Empty'
           ,'IsAllOf', 'IsCallable', 'IsIterable', 'IsNoneOf', 'IsOneOf'
           ,'IsOnlyOneOf', 'Not', 'Or', 'Self', 'Xor', 'YieldSeq'
           ,'register_type', 'is_registered_type', 'unregister_type'
-          ,'Function']
+          ,'CheckerFunction']
 
 import inspect
 import sys
@@ -191,7 +191,7 @@ class _TC_XorError(_TC_NestedError):
 
         return _TC_NestedError.error_message(self) + " (matched %s)" % m
 
-class _TC_FunctionError(_TC_Exception):
+class _TC_CheckerFunctionError(_TC_Exception):
     def __init__(self, checking_func, obj):
         self.checking_func = checking_func
         self.rejected_obj = obj
@@ -754,7 +754,7 @@ class TypeVariables(CheckType):
         else:
             raise TypeError(func)
 
-class Function(CheckType):
+class CheckerFunction(CheckType):
     def __init__(self, func):
         self._func = func
         self.type = self
@@ -770,10 +770,10 @@ class Function(CheckType):
 
     def __typecheck__(self, func, to_check):
         if False == self._func(to_check):
-            raise _TC_FunctionError(self._func, to_check)
+            raise _TC_CheckerFunctionError(self._func, to_check)
 
     def __str__(self):
-        return "Function(%s)" % self._func
+        return "CheckerFunction(%s)" % self._func
 
     def __repr__(self):
         return str(self)
@@ -787,7 +787,7 @@ class Function(CheckType):
         return hash(str(self.__class__) + str(hash(self._func)))
 
 # Register some of the above types so that Type() knows about them
-for c in (CheckType, List, Tuple, Dict, Set, Single, TypeVariables, Function):
+for c in (CheckType, List, Tuple, Dict, Set, Single, TypeVariables, CheckerFunction):
     register_type(c)
 
 ### The following are utility classes intended to make writing complex
