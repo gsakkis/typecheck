@@ -46,19 +46,6 @@ class _TC_Exception(Exception):
     def format_bad_object(self, bad_object):
         return ("for %s, " % str(bad_object), self)
 
-class _TC_LengthError(_TC_Exception):
-    def __init__(self, wrong, right=None):
-        _TC_Exception.__init__(self)
-
-        self.wrong = wrong
-        self.right = right
-
-    def error_message(self):
-        m = None
-        if self.right is not None:
-            m = ", expected %d" % self.right
-        return "length was %d%s" % (self.wrong, m or "")
-
 class _TC_TypeError(_TC_Exception):
     def __init__(self, wrong, right):
         _TC_Exception.__init__(self)
@@ -312,7 +299,7 @@ def Type(obj):
         if v is not None:
             return v
 
-    raise AssertionError("Object is of type '%s'; not a type" % str(type(obj)))
+    raise TypeError("Object is of type '%s'; not a type" % str(type(obj)))
 
 def __checking(start_stop, *args):
     attr = '__%schecking__' % start_stop
@@ -506,37 +493,44 @@ class Dict(TypeAnnotation):
 class List(TypeAnnotation):
     name = "List"
 
-    def __init__(self, *type):
-        if not type:
-            raise TypeError("Must supply at least one type to __init__()")
-        self._types = [Type(t) for t in type]
+    def __init__(self, type):
+        self._types = [Type(type)]
         self.type = [t.type for t in self._types]
 
     def __typecheck__(self, func, to_check):
         if not isinstance(to_check, list):
             raise _TC_TypeError(to_check, self.type)
-        if len(to_check) % len(self._types):
-            raise _TC_LengthError(len(to_check))
 
-        # lists can be patterned, meaning that [int, float]
-        # requires that the to-be-checked list contain an alternating
-        # sequence of integers and floats. The pattern must be completed
-        # (e.g, [5, 5.0, 6, 6.0] but not [5, 5.0, 6]) for the list to
-        # typecheck successfully.
-        #
-        # A list with a single type, [int], is a sub-case of patterned
-        # lists
-        #
-        # XXX: Investigate speed increases by special-casing single-typed
-        # lists
-        pat_len = len(self._types)
-        type_tuples = [(i, val, self._types[i % pat_len]) for (i, val)
-                    in enumerate(to_check)]
-        for (i, val, type) in type_tuples:
+        type = self._types[0]
+        for i, val in enumerate(to_check):
             try:
                 check_type(type, func, val)
             except _TC_Exception, e:
                 raise _TC_IndexError(i, e)
+
+    def __eq__(self, other):
+        return other.__class__ is self.__class__ and self._types == other._types
+
+    def __hash__(self):
+        def strhash(obj):
+            return str(hash(obj))
+
+        return hash(''.join(map(strhash, [self.__class__] + self._types)))
+
+    @classmethod
+    def __typesig__(cls, obj):
+        if isinstance(obj, list) and len(obj) == 1:
+            return cls(obj[0])
+
+### Provide typechecking for the built-in tuple() class
+class Tuple(TypeAnnotation):
+    name = "Tuple"
+
+    def __init__(self, *types):
+        if not types:
+            raise TypeError("Must supply at least one type to __init__()")
+        self._types = [Type(t) for t in types]
+        self.type = tuple(t.type for t in self._types)
 
     def __eq__(self, other):
         if other.__class__ is not self.__class__:
@@ -555,20 +549,6 @@ class List(TypeAnnotation):
             return str(hash(obj))
 
         return hash(''.join(map(strhash, [self.__class__] + self._types)))
-
-    @classmethod
-    def __typesig__(cls, obj):
-        if isinstance(obj, list):
-            return List(*obj)
-
-### Provide typechecking for the built-in tuple() class
-class Tuple(List):
-    name = "Tuple"
-
-    def __init__(self, *type):
-        List.__init__(self, *type)
-
-        self.type = tuple(self.type)
 
     def __typecheck__(self, func, to_check):
         # Note that tuples of varying length (e.g., (int, int) and (int, int, int))

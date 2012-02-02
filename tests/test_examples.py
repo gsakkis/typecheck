@@ -1,5 +1,5 @@
 from support import TestCase
-from examples import Empty, Length
+from examples import Empty, Length, PatternList, _TC_LengthError
 import typecheck
 
 def check_type(typ, to_check):
@@ -257,8 +257,6 @@ class Test_Length(TestCase):
         check_type(Length(5), A())
 
     def test_fail_1(self):
-        from typecheck import _TC_LengthError
-
         try:
             check_type(Length(5), [6])
         except _TC_LengthError, e:
@@ -314,8 +312,6 @@ class Test_Empty(TestCase):
         check_type(Empty(list), [])
 
     def test_list_failure(self):
-        from typecheck import _TC_LengthError
-
         try:
             check_type(Empty(list), [5, 6])
         except _TC_LengthError, e:
@@ -328,8 +324,6 @@ class Test_Empty(TestCase):
         check_type(Empty(dict), {})
 
     def test_dict_failure(self):
-        from typecheck import _TC_LengthError
-
         try:
             check_type(Empty(dict), {'f': 5})
         except _TC_LengthError, e:
@@ -342,8 +336,6 @@ class Test_Empty(TestCase):
         check_type(Empty(set), set())
 
     def test_set_failure(self):
-        from typecheck import _TC_LengthError
-
         try:
             check_type(Empty(set), set([5, 6]))
         except _TC_LengthError, e:
@@ -360,8 +352,6 @@ class Test_Empty(TestCase):
         check_type(Empty(A), A())
 
     def test_userdef_failure(self):
-        from typecheck import _TC_LengthError
-
         class A(object):
             def __len__(self):
                 return 2
@@ -414,3 +404,122 @@ class Test_Empty(TestCase):
             (Empty(dict), Empty(set)) ]
 
         self.multipleAssertEqualHashes(eq_tests, ne_tests)
+
+class PatternListTests(TestCase):
+    def setUp(self):
+        def lis(obj):
+            check_type(PatternList(int, float), obj)
+
+        self.list = lis
+
+    def test_success(self):
+        self.list([])
+        self.list([ 4, 5.0 ])
+        self.list([ 4, 5.0, 8, 9.0 ])
+        self.list([ 4, 5.0, 9, 8.0, 4, 5.0 ])
+
+    def test_index_failure(self):
+        from typecheck import _TC_IndexError, _TC_TypeError
+
+        try:
+            # 5 is not a float
+            self.list([4, 5, 6, 7.0])
+        except _TC_IndexError, e:
+            assert e.index == 1
+            assert isinstance(e.inner, _TC_TypeError)
+            assert e.inner.wrong == int
+            assert e.inner.right == float
+        else:
+            self.fail("Passed incorrectly")
+
+    def test_type_failure(self):
+        from typecheck import _TC_TypeError
+
+        try:
+            self.list({ 'f': 4 })
+        except _TC_TypeError, e:
+            assert e.right == [int, float]
+            assert e.wrong == {str: int}
+        else:
+            self.fail("Passed incorrectly")
+
+    def test_equality(self):
+        class A(object): pass
+        class B(A): pass
+
+        eq_tests = [
+            (PatternList(str, str), PatternList(str, str)),
+            (PatternList(A, B), PatternList(A, B)),
+            (PatternList(PatternList(int, int), int), PatternList(PatternList(int, int), int)) ]
+
+        ne_tests = [
+            (PatternList(str, int), PatternList(int, str)),
+            (PatternList(A, B), PatternList(B, B)),
+            (PatternList(A, B), PatternList(A, A)),
+            (PatternList(PatternList(int, int)), PatternList(PatternList(PatternList(int, int)))),
+            (PatternList(int, int), PatternList(int, int, int)),
+            (PatternList(int, int), [int, int]) ]
+
+        self.multipleAssertEqual(eq_tests, ne_tests)
+
+    def test_hash(self):
+        class A(object): pass
+        class B(A): pass
+
+        eq_tests = [
+            (PatternList(str, str), PatternList(str, str)),
+            (PatternList(A, B), PatternList(A, B)),
+            (PatternList(PatternList(int, int), int), PatternList(PatternList(int, int), int)) ]
+
+        ne_tests = [
+            (PatternList(str, int), PatternList(int, str)),
+            (PatternList(A, B), PatternList(B, B)),
+            (PatternList(A, B), PatternList(A, A)),
+            (PatternList(PatternList(int, int)), PatternList(PatternList(PatternList(int, int)))),
+            (PatternList(int, int), PatternList(int, int, int)) ]
+
+        self.multipleAssertEqualHashes(eq_tests, ne_tests)
+
+    def test_patterned_lists_in_lists(self):
+        from typecheck import _TC_IndexError, _TC_TypeError
+
+        def list1(obj):
+            check_type(PatternList([int, str]), obj)
+
+        # This should pass (list of lists)
+        list1([[4, "foo"], [6, "foo", 7, "bar"]])
+
+        try:
+            # 6 is not list of alternating integers and strings
+            list1([[4, "foo"], 6])
+        except _TC_IndexError, e:
+            assert e.index == 1
+            assert isinstance(e.inner, _TC_TypeError)
+            assert e.inner.right == [int, str]
+            assert e.inner.wrong == int
+        else:
+            self.fail("Passed incorrectly")
+
+    def test_patterned_lists_of_patterned_lists(self):
+        from typecheck import _TC_IndexError, _TC_TypeError
+
+        # [[[i, s]]] (list of lists of lists of alternating ints and strs)
+        def list2(obj):
+            check_type(PatternList([[int, str]]), obj)
+
+        list2([ [[4, "foo"], [5, "bar"]], [[4, "baz", 7, "foo"]] ])
+
+        try:
+            # The error is in [4,[6]]; the [6] isn't a string
+            list2([[[6, "a"], [7, "r", 8, "q"], [4, [6]], [6, "aaa"]]])
+        except _TC_IndexError, e:
+            assert e.index == 0
+            assert isinstance(e.inner, _TC_IndexError)
+            assert e.inner.index == 2
+            assert isinstance(e.inner.inner, _TC_IndexError)
+            assert e.inner.inner.index == 1
+            assert isinstance(e.inner.inner.inner, _TC_TypeError)
+            assert e.inner.inner.inner.right == str
+            assert e.inner.inner.inner.wrong == [int]
+        else:
+            self.fail("Passed incorrectly")

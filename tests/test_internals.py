@@ -269,7 +269,7 @@ class TupleTests(TestCase):
         else:
             self.fail("Passed incorrectly")
 
-class AtomicType_ListTests(TestCase):
+class ListTests(TestCase):
     def setUp(self):
         from typecheck import List
 
@@ -321,7 +321,6 @@ class AtomicType_ListTests(TestCase):
             (List(str), List(int)),
             (List(A), List(B)),
             (List(List(int)), List(List(List(int)))),
-            (List(int), List(int, int)),
             (List(int), [int]) ]
 
         self.multipleAssertEqual(eq_tests, ne_tests)
@@ -340,8 +339,7 @@ class AtomicType_ListTests(TestCase):
         ne_tests = [
             (List(str), List(int)),
             (List(A), List(B)),
-            (List(List(int)), List(List(List(int)))),
-            (List(int), List(int, int)) ]
+            (List(List(int)), List(List(List(int)))) ]
 
         self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
@@ -357,141 +355,8 @@ class AtomicType_ListTests(TestCase):
         else:
             self.fail("Passed incorrectly")
 
-class Pattern_ListTests(TestCase):
-    def setUp(self):
-        from typecheck import List
-
-        def lis(obj):
-            check_type(List(int, float), obj)
-
-        self.list = lis
-
-    def test_success(self):
-        self.list([])
-        self.list([ 4, 5.0 ])
-        self.list([ 4, 5.0, 8, 9.0 ])
-        self.list([ 4, 5.0, 9, 8.0, 4, 5.0 ])
-
-    def test_index_failure(self):
-        from typecheck import _TC_IndexError, _TC_TypeError
-
-        try:
-            # 5 is not a float
-            self.list([4, 5, 6, 7.0])
-        except _TC_IndexError, e:
-            assert e.index == 1
-            assert isinstance(e.inner, _TC_TypeError)
-            assert e.inner.wrong == int
-            assert e.inner.right == float
-        else:
-            self.fail("Passed incorrectly")
-
-    def test_type_failure(self):
-        from typecheck import _TC_TypeError
-
-        try:
-            self.list({ 'f': 4 })
-        except _TC_TypeError, e:
-            assert e.right == [int, float]
-            assert e.wrong == {str: int}
-        else:
-            self.fail("Passed incorrectly")
-
-    def test_length_failure(self):
-        from typecheck import _TC_LengthError
-
-        try:
-            self.list([4, 5.0, 6, 7.0, 6])
-        except _TC_LengthError, e:
-            assert e.wrong == 5
-        else:
-            self.fail("Passed incorrectly")
-
-    def test_equality(self):
-        from typecheck import List
-
-        class A(object): pass
-        class B(A): pass
-
-        eq_tests = [
-            (List(str, str), List(str, str)),
-            (List(A, B), List(A, B)),
-            (List(List(int, int), int), List(List(int, int), int)) ]
-
-        ne_tests = [
-            (List(str, int), List(int, str)),
-            (List(A, B), List(B, B)),
-            (List(A, B), List(A, A)),
-            (List(List(int, int)), List(List(List(int, int)))),
-            (List(int, int), List(int, int, int)),
-            (List(int, int), [int, int]) ]
-
-        self.multipleAssertEqual(eq_tests, ne_tests)
-
-    def test_hash(self):
-        from typecheck import List
-
-        class A(object): pass
-        class B(A): pass
-
-        eq_tests = [
-            (List(str, str), List(str, str)),
-            (List(A, B), List(A, B)),
-            (List(List(int, int), int), List(List(int, int), int)) ]
-
-        ne_tests = [
-            (List(str, int), List(int, str)),
-            (List(A, B), List(B, B)),
-            (List(A, B), List(A, A)),
-            (List(List(int, int)), List(List(List(int, int)))),
-            (List(int, int), List(int, int, int)) ]
-
-        self.multipleAssertEqualHashes(eq_tests, ne_tests)
 
 class NestedTests(TestCase):
-    def test_patterned_lists_in_lists(self):
-        from typecheck import _TC_IndexError, List, _TC_TypeError
-
-        def list1(obj):
-            check_type(List([int, str]), obj)
-
-        # This should pass (list of lists)
-        list1([[4, "foo"], [6, "foo", 7, "bar"]])
-
-        try:
-            # 6 is not list of alternating integers and strings
-            list1([[4, "foo"], 6])
-        except _TC_IndexError, e:
-            assert e.index == 1
-            assert isinstance(e.inner, _TC_TypeError)
-            assert e.inner.right == [int, str]
-            assert e.inner.wrong == int
-        else:
-            self.fail("Passed incorrectly")
-
-    def test_patterned_lists_of_patterned_lists(self):
-        from typecheck import _TC_IndexError, List, _TC_TypeError
-
-        # [[[i, s]]] (list of lists of lists of alternating ints and strs)
-        def list2(obj):
-            check_type(List([[int, str]]), obj)
-
-        list2([ [[4, "foo"], [5, "bar"]], [[4, "baz", 7, "foo"]] ])
-
-        try:
-            # The error is in [4,[6]]; the [6] isn't a string
-            list2([[[6, "a"], [7, "r", 8, "q"], [4, [6]], [6, "aaa"]]])
-        except _TC_IndexError, e:
-            assert e.index == 0
-            assert isinstance(e.inner, _TC_IndexError)
-            assert e.inner.index == 2
-            assert isinstance(e.inner.inner, _TC_IndexError)
-            assert e.inner.inner.index == 1
-            assert isinstance(e.inner.inner.inner, _TC_TypeError)
-            assert e.inner.inner.inner.right == str
-            assert e.inner.inner.inner.wrong == [int]
-        else:
-            self.fail("Passed incorrectly")
 
     def test_nested_monotype_lists(self):
         from typecheck import _TC_IndexError, List, _TC_TypeError
@@ -741,7 +606,7 @@ class ExtensibleSigTests(TestCase):
             @accepts(5, 6)
             def bar(a, b):
                 return a, b
-        except AssertionError:
+        except TypeError:
             pass
         else:
             raise AssertionError("Succeeded incorrectly")
