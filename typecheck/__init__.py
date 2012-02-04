@@ -388,8 +388,6 @@ class TypeAnnotation(object):
     def __repr__(self):
         return type(self).name + '(' + ', '.join(sorted(repr(t) for t in self._types)) + ')'
 
-    __str__ = __repr__
-
     def __eq__(self, other):
         return not self != other
 
@@ -587,10 +585,8 @@ class Set(TypeAnnotation):
         else:
             raise TypeError("Must supply at least one type to __init__()")
 
-    def __str__(self):
+    def __repr__(self):
         return "Set(" + str([e for e in self.type]) + ")"
-
-    __repr__ = __str__
 
     def __typecheck__(self, func, to_check):
         if not isinstance(to_check, set):
@@ -640,10 +636,8 @@ class TypeVariables(TypeAnnotation):
     def __init__(self, name):
         self.type = name
 
-    def __str__(self):
+    def __repr__(self):
         return "TypeVariable(%s)" % self.type
-
-    __repr__ = __str__
 
     def __hash__(self):
         return hash(''.join([str(o) for o in self.__class__
@@ -729,11 +723,8 @@ class CheckerFunction(TypeAnnotation):
         if False == self._func(to_check):
             raise _TC_CheckerFunctionError(self._func, to_check)
 
-    def __str__(self):
-        return "CheckerFunction(%s)" % self._func
-
     def __repr__(self):
-        return str(self)
+        return "CheckerFunction(%s)" % self._func
 
     def __eq__(self, other):
         if self.__class__ is not other.__class__:
@@ -762,10 +753,8 @@ class Any(TypeAnnotation):
     def __typecheck__(self, func, to_check):
         pass
 
-    def __str__(self):
+    def __repr__(self):
         return "Any()"
-
-    __repr__ = __str__
 
     # All instances of this class are equal
     def __eq__(self, other):
@@ -863,10 +852,8 @@ class IsCallable(TypeAnnotation):
     def __init__(self):
         self.type = self
 
-    def __str__(self):
+    def __repr__(self):
         return "IsCallable()"
-
-    __repr__ = __str__
 
     # They're all the same
     # XXX Change IsCallable to a singleton class
@@ -914,7 +901,7 @@ class HasAttr(TypeAnnotation):
     def __hash__(self):
         return hash(str(hash(self.__class__)) + str(hash(str(self._attr_types))))
 
-    def __str__(self):
+    def __repr__(self):
         any_type = []
         spec_type = {}
 
@@ -930,8 +917,6 @@ class HasAttr(TypeAnnotation):
 
         return "HasAttr(" + ', '.join(map(str, msg)) + ")"
 
-    __repr__ = __str__
-
 class IsIterable(TypeAnnotation):
     def __init__(self):
         self.type = self
@@ -944,10 +929,8 @@ class IsIterable(TypeAnnotation):
     def __hash__(self):
         return id(self.__class__)
 
-    def __str__(self):
+    def __repr__(self):
         return "IsIterable()"
-
-    __repr__ = __str__
 
     def __typecheck__(self, func, to_check):
         if not (hasattr(to_check, '__iter__') and callable(to_check.__iter__)):
@@ -965,10 +948,8 @@ class YieldSeq(TypeAnnotation):
     def __hash__(self):
         return id(self)
 
-    def __str__(self):
+    def __repr__(self):
         return "YieldSeq(" + ", ".join(map(str, self._type)) + ")"
-
-    __repr__ = __str__
 
     def __eq__(self, other):
         if self.__class__ is not other.__class__:
@@ -1038,10 +1019,8 @@ class Class(TypeAnnotation):
     def __hash__(self):
         return hash(str(self.__class__) + self.class_name)
 
-    def __str__(self):
+    def __repr__(self):
         return "Class('%s')" % self.class_name
-
-    __repr__ = __str__
 
     def __eq__(self, other):
         if self.__class__ is not other.__class__:
@@ -1154,9 +1133,6 @@ class Typeclass(TypeAnnotation):
         return hash(str(self.__class__) + str(hash(frozenset(self._instances))))
 
     def __repr__(self):
-        return object.__repr__(self)
-
-    def __str__(self):
         return 'Typeclass(' + ', '.join(map(str, self._instances)) + ')'
 
 # The current implementation of Self relies on the TypeVariables machinery
